@@ -25,5 +25,3 @@ class JSON_API_Category {
   }
   
 }
-
-?>

@@ -279,5 +279,3 @@ class JSON_API_Post {
   }
   
 }
-
-?>

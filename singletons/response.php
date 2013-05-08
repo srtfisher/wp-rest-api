@@ -180,5 +180,3 @@ class JSON_API_Response {
   }
   
 }
-
-?>

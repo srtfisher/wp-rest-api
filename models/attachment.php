@@ -52,5 +52,3 @@ class JSON_API_Attachment {
   }
   
 }
-
-?>

@@ -76,5 +76,3 @@ class JSON_API_Comment {
   }
   
 }
-
-?>

@@ -330,5 +330,3 @@ class JSON_API_Core_Controller {
   }
   
 }
-
-?>

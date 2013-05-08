@@ -23,5 +23,3 @@ class JSON_API_Respond_Controller {
   }
   
 }
-
-?>

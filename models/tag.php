@@ -22,5 +22,3 @@ class JSON_API_Tag {
   }
   
 }
-
-?>

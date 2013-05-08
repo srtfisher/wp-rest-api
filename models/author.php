@@ -58,5 +58,3 @@ class JSON_API_Author {
   }
   
 }
-
-?>
