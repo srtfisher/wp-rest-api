@@ -1,17 +1,9 @@
 JSON API
 ======
-sads
-Contributors: dphiffer
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DH4MEG99JR2WE
-Tags: json, api, ajax, cms, admin, integration, moma
-Requires at least: 2.8
-Tested up to: 3.1
-Stable tag: 1.0.7
-
 A RESTful API for WordPress
 
-== Description ==
 
+## Description
 JSON API allows you to retrieve and manipulate WordPress content using HTTP requests. There are three main goals:
 
 1. Provide a simple, consistent external interface
@@ -22,16 +14,16 @@ This plugin was created at [The Museum of Modern Art](http://moma.org/) for the 
 
 See the [Other Notes](http://wordpress.org/extend/plugins/json-api/other_notes/) section for the complete documentation.
 
-== Installation ==
+## Installation
 
 1. Upload the `json-api` folder to the `/wp-content/plugins/` directory or install directly through the plugin installer.
 2. Activate the plugin through the 'Plugins' menu in WordPress or by using the link provided by the plugin installer.
 
-== Screenshots ==
+## Screenshots
 
 1. Our old friend, in JSON format
 
-== Documentation ==
+## Documentation
 
 1. General concepts  
    1.1. Requests  
@@ -60,9 +52,9 @@ See the [Other Notes](http://wordpress.org/extend/plugins/json-api/other_notes/)
    6.1. Preparing a WordPress test site
    6.2. Running the tests
 
-== 1. General Concepts ==
+## 1. General Concepts
 
-== 1.1. Requests ==
+### 1.1. Requests
 
 Requests use a simple REST-style HTTP GET or POST. To invoke the API, include a non-empty query value for `json` in the URL.
 
@@ -71,19 +63,19 @@ JSON API operates in two modes:
 1. *Implicit mode* is triggered by setting the `json` query var to a non-empty value on any WordPress page. The content that would normally appear on that page is returned in JSON format.
 2. *Explicit mode* is triggered by setting `json` to a known method string. See *Section 2: Request methods* for a complete method listing.
 
-= Implicit mode examples: =
+#### Implicit mode examples:
 
  * `http://www.example.org/?json=1`
  * `http://www.example.org/?p=47&json=1`
  * `http://www.example.org/tag/banana/?json=1`
 
-= Explicit mode examples: =
+#### Explicit mode examples:
 
 * `http://www.example.org/?json=get_recent_posts`
 * `http://www.example.org/?json=get_post&post_id=47`
 * `http://www.example.org/?json=get_tag_posts&tag_slug=banana`
 
-= With user-friendly permalinks configured: =
+#### With user-friendly permalinks configured:
 
 * `http://www.example.org/api/get_recent_posts/`
 * `http://www.example.org/api/get_post/?post_id=47`
@@ -92,15 +84,15 @@ JSON API operates in two modes:
 __Further reading__  
 See *Section 3: Request arguments* for more information about request arguments to modify the response.
 
-== 1.2. Controllers ==
+### 1.2. Controllers
 
 The 1.0 release of JSON API introduced a modular controller system. This allows developers to flexibly add features to the API and give users more control over which methods they have enabled.
 
-= The Core controller =
+#### The Core Controller
 
 Most of the methods available prior to version 1.0 have been moved to the Core controller. The two exceptions are `submit_comment` and `create_post` which are now available from the Respond and Posts controllers, respectively. The Core controller is the only one enabled by default. All other functionality must be enabled from the JSON API Settings page (under Settings in the WordPress admin menu).
 
-= Specifying a controller =
+#### Specifying a Controller
 
 There are a few ways of specifying a controller, depending on how you are calling the API:
 
@@ -119,7 +111,7 @@ The current release includes three controllers: Core, Posts, and Respond. Develo
 __Further reading__  
 See *Section 2: Request methods* for a complete reference of available controllers and methods. For documentation on extending JSON API with new controllers see *Section 5.2: Developing JSON API controllers*.
 
-== 1.3. Responses ==
+### 1.3. Responses
 
 The standard response format for JSON API is (as you may have guessed) [JSON](http://json.org/).
 
@@ -170,7 +162,7 @@ Here is an example response from `http://localhost/wordpress/?json=1` called on 
       ]
     }
 
-== 2. Request methods ==
+#### 2. Request Methods
 
 Request methods are available from the following controllers:
 
@@ -178,12 +170,12 @@ Request methods are available from the following controllers:
 * Posts controller - data manipulation methods for posts
 * Respond controller - comment/trackback submission methods
 
-== 2.1. Core controller methods ==
+### 2.1. Core controller methods
 
 The Core controller offers a mostly-complete set of introspection methods for retrieving content from WordPress.
 
 
-== Method: info ==
+#### Method: info
 
 Returns information about JSON API.
 
@@ -924,7 +916,7 @@ The following are constants you can define in your `wp-config.php` folder:
 * `JSON_API_DIR` - set to the directory where JSON API plugin lives (in some cases this can be useful for `mu-plugins` with WordPress MU)
 * `JSON_API_CONTROLLERS` - a comma-separated list of default controllers to enable (this is overridden by the JSON API settings page)
 
-== 6. Unit tests ==
+## 6. Unit tests
 
 JSON API comes with a set of tests that should make it easier to maintain and reveal incompatibilities when they might occur. This is an ongoing process, I hope to improve the test coverage going forward.
 
