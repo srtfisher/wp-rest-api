@@ -3,12 +3,13 @@
 Plugin Name: JSON API
 Plugin URI: http://wordpress.org/extend/plugins/json-api/
 Description: A RESTful API for WordPress
-Version: 1.0.7
+Version: 1.1
 Author: Dan Phiffer
 Author URI: http://phiffer.org/
 */
 
 $dir = json_api_dir();
+
 require_once $dir . '/singletons/api.php';
 require_once $dir . '/singletons/query.php';
 require_once $dir . '/singletons/introspector.php';
@@ -39,14 +40,30 @@ function json_api_init() {
 	$json_api = JSON_API::Instance();
 }
 
+/**
+ * Shows a warning when PHP is out of date
+ * 
+ * @return void
+ */
 function json_api_php_version_warning() {
 	echo "<div id=\"json-api-warning\" class=\"updated fade\"><p>Sorry, JSON API requires PHP version 5.0 or greater.</p></div>";
 }
 
+/**
+ * Warning when JSON API is setup incorrectly
+ * 
+ * @return void
+ */
 function json_api_class_warning() {
 	echo "<div id=\"json-api-warning\" class=\"updated fade\"><p>Oops, JSON_API class not found. If you've defined a JSON_API_DIR constant, double check that the path is correct.</p></div>";
 }
 
+/**
+ * Activation Hook
+ *
+ * @access private
+ * @return void
+ */
 function json_api_activation() {
 	// Add the rewrite rule on activation
 	global $wp_rewrite;
@@ -54,12 +71,23 @@ function json_api_activation() {
 	$wp_rewrite->flush_rules();
 }
 
+/**
+ * Deactivation Hook
+ *
+ * @access private
+ * @return void
+ */
 function json_api_deactivation() {
 	// Remove the rewrite rule on deactivation
 	global $wp_rewrite;
 	$wp_rewrite->flush_rules();
 }
 
+/**
+ * Filter Applied for Rewrite Actions
+ *
+ * @access private
+ */
 function json_api_rewrites($wp_rules) {
 	$base = get_option('json_api_base', 'api');
 	if (empty($base)) {
@@ -72,6 +100,14 @@ function json_api_rewrites($wp_rules) {
 	return array_merge($json_api_rules, $wp_rules);
 }
 
+/**
+ * Directory of the JSON API Plugin
+ *
+ * You can override the JSON API Directory by setting the
+ * constant 'JSON_API_DIR'.
+ * 
+ * @return string
+ */
 function json_api_dir() {
 	if (defined('JSON_API_DIR') && file_exists(JSON_API_DIR))
 		return JSON_API_DIR;
@@ -83,5 +119,3 @@ function json_api_dir() {
 add_action('init', 'json_api_init');
 register_activation_hook("$dir/json-api.php", 'json_api_activation');
 register_deactivation_hook("$dir/json-api.php", 'json_api_deactivation');
-
-?>
