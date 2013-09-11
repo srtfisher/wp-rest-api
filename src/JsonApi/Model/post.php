@@ -1,6 +1,6 @@
-<?php
+<?php namespace JsonApi\Model;
 
-class JSON_API_Post {
+class Post {
   
   // Note:
   //   JSON_API_Post objects must be instantiated within The Loop.
@@ -26,7 +26,7 @@ class JSON_API_Post {
   var $thumbnail;       // String
   var $custom_fields;   // Object (included by using custom_fields query var)
   
-  function JSON_API_Post($wp_post = null) {
+  function __construct($wp_post = null) {
     if (!empty($wp_post)) {
       $this->import_wp_object($wp_post);
     }

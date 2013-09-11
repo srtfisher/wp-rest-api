@@ -8,6 +8,8 @@ Author: Dan Phiffer
 Author URI: http://phiffer.org/
 */
 
+use JsonAPi\Manager\Application;
+
 $dir = json_api_dir();
 
 require_once $dir . '/singletons/api.php';
@@ -29,15 +31,15 @@ require_once $dir . '/models/attachment.php';
 function json_api_init() {
 	global $json_api;
 
-	if (phpversion() < 5)
+	if (phpversion() < 5.3)
 		return add_action('admin_notices', 'json_api_php_version_warning');
 
-	if (! class_exists('JSON_API'))
+	if (! class_exists('Application'))
 		return add_action('admin_notices', 'json_api_class_warning');
 
 	add_filter('rewrite_rules_array', 'json_api_rewrites');
 
-	$json_api = JSON_API::Instance();
+	$json_api = Application::Instance();
 }
 
 /**
@@ -109,10 +111,7 @@ function json_api_rewrites($wp_rules) {
  * @return string
  */
 function json_api_dir() {
-	if (defined('JSON_API_DIR') && file_exists(JSON_API_DIR))
-		return JSON_API_DIR;
-	else
-		return __DIR__;
+	return (defined('JSON_API_DIR') && file_exists(JSON_API_DIR)) ? JSON_API_DIR : __DIR__;
 }
 
 // Add initialization and activation hooks

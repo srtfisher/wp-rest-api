@@ -1,10 +1,11 @@
-<?php
+<?php namespace Plex\Controller;
+
 /*
 Controller name: Core
 Controller description: Basic introspection methods
 */
 
-class JSON_API_Core_Controller {
+class Core_Controller {
   
   public function info() {
     global $json_api;

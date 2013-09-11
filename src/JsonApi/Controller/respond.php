@@ -1,10 +1,10 @@
-<?php
+<?php namespace Plex\Controller;
 /*
 Controller name: Respond
 Controller description: Comment/trackback submission methods
 */
 
-class JSON_API_Respond_Controller {
+class Respond_Controller {
   
   function submit_comment() {
     global $json_api;

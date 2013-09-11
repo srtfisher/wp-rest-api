@@ -1,6 +1,6 @@
-<?php
+<?php namespace JsonApi\Model;
 
-class JSON_API_Comment {
+class Comment {
   
   var $id;      // Integer
   var $name;    // String
@@ -10,7 +10,7 @@ class JSON_API_Comment {
   var $parent;  // Integer
   var $author;  // Object (only if the user was registered & logged in)
   
-  function JSON_API_Comment($wp_comment = null) {
+  function __construct($wp_comment = null) {
     if ($wp_comment) {
       $this->import_wp_object($wp_comment);
     }

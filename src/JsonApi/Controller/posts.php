@@ -1,10 +1,10 @@
-<?php
+<?php namespace Plex\Controller;
 /*
 Controller name: Posts
 Controller description: Data manipulation methods for posts
 */
 
-class JSON_API_Posts_Controller {
+class Posts_Controller {
 
   public function create_post() {
     global $json_api;
