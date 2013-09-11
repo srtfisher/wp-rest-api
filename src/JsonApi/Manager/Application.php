@@ -1,4 +1,7 @@
 <?php namespace JsonApi\Manager;
+use Plex\Manager\Query;
+use Plex\Manager\Introspector;
+use Plex\Manager\Response;
 
 /**
  * JSON API Manager
@@ -21,9 +24,9 @@ class Application {
    * @return void
    */
   public function __construct() {
-    $this->query = new JSON_API_Query();
-    $this->introspector = new JSON_API_Introspector();
-    $this->response = new JSON_API_Response();
+    $this->query = new Query();
+    $this->introspector = new Introspector();
+    $this->response = new Response();
 
     add_action('template_redirect', array(&$this, 'template_redirect'));
     add_action('admin_menu', array(&$this, 'admin_menu'));
@@ -39,7 +42,7 @@ class Application {
   public static function Instance()
   {
     if (self::$instance == NULL)
-      self::$instance = new JSON_API();
+      self::$instance = new Application();
 
     return self::$instance;
   }
@@ -63,7 +66,7 @@ class Application {
       }
       $controller_class = $this->controller_class($controller);
       
-      if (!class_exists($controller_class)) {
+      if (! class_exists($controller_class)) {
         $this->error("Unknown controller '$controller_class'.");
       }
       
@@ -94,11 +97,22 @@ class Application {
     }
   }
   
-  function admin_menu() {
+  /**
+   * admin_menu hook
+   *
+   * Called on `admin_menu`
+   */
+  public function admin_menu() {
     add_options_page('JSON API Settings', 'JSON API', 'manage_options', 'json-api', array(&$this, 'admin_options'));
   }
   
-  function admin_options() {
+  /**
+   * Callback for Admin Page
+   * 
+   * @return void
+   * @access  private
+   */
+  public function admin_options() {
     if (!current_user_can('manage_options'))  {
       wp_die( __('You do not have sufficient permissions to access this page.') );
     }
@@ -295,7 +309,7 @@ class Application {
     }
   }
   
-  function save_option($id, $value) {
+  public function save_option($id, $value) {
     $option_exists = (get_option($id, null) !== null);
     if ($option_exists) {
       update_option($id, $value);
@@ -304,7 +318,7 @@ class Application {
     }
   }
   
-  function get_controllers() {
+  public function get_controllers() {
     $controllers = array();
     $dir = json_api_dir();
     $dh = opendir("$dir/controllers");
@@ -327,7 +341,7 @@ class Application {
     return (in_array($controller, $active_controllers));
   }
   
-  function update_controllers($controllers) {
+  public function update_controllers($controllers) {
     if (is_array($controllers)) {
       return implode(',', $controllers);
     } else {
@@ -335,7 +349,7 @@ class Application {
     }
   }
   
-  function controller_info($controller) {
+  public function controller_info($controller) {
     $path = $this->controller_path($controller);
     $class = $this->controller_class($controller);
     $response = array(
@@ -367,34 +381,34 @@ class Application {
     return $response;
   }
   
-  function controller_class($controller) {
+  public function controller_class($controller) {
     return "json_api_{$controller}_controller";
   }
   
-  function controller_path($controller) {
+  public function controller_path($controller) {
     $dir = json_api_dir();
     $controller_class = $this->controller_class($controller);
     return apply_filters("{$controller_class}_path", "$dir/controllers/$controller.php");
   }
   
-  function get_nonce_id($controller, $method) {
+  public function get_nonce_id($controller, $method) {
     $controller = strtolower($controller);
     $method = strtolower($method);
     return "json_api-$controller-$method";
   }
   
-  function flush_rewrite_rules() {
+  public function flush_rewrite_rules() {
     global $wp_rewrite;
     $wp_rewrite->flush_rules();
   }
   
-  function error($message = 'Unknown error', $status = 'error') {
+  public function error($message = 'Unknown error', $status = 'error') {
     $this->response->respond(array(
       'error' => $message
     ), $status);
   }
   
-  function include_value($key) {
+  public function include_value($key) {
     return $this->response->is_value_included($key);
   }
   
