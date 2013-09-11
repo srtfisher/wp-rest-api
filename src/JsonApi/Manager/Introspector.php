@@ -1,6 +1,6 @@
-<?php
+<?php namespace JsonApi\Manager;
 
-class JSON_API_Introspector {
+class Introspector {
   
   public function get_posts($query = false, $wp_posts = false) {
     global $post;

@@ -1,6 +1,6 @@
-<?php
+<?php namespace JsonApi\Manager;
 
-class JSON_API_Query {
+class Query {
   
   // Default values
   protected $defaults = array(

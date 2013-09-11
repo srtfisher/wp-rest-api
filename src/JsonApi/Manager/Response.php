@@ -1,6 +1,6 @@
-<?php
+<?php namespace JsonApi\Manager;
 
-class JSON_API_Response {
+class Response {
   
   function setup() {
     global $json_api;
