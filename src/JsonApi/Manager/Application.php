@@ -474,4 +474,14 @@ class Application {
 
 		return $index;
 	}
+
+	/**
+	 * Active Controller Index
+	 *
+	 * @return array
+	 */
+	public function activeControllers()
+	{
+		return (array) Settings::Instance()->active_controllers;
+	}
 }
