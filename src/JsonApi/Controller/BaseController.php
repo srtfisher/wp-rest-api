@@ -14,4 +14,35 @@ abstract class BaseController {
 	{
 		return json_encode($data);
 	}
+
+	/**
+	 * Human Readable method names
+	 *
+	 * @param  string name
+	 */
+	public function humanMethodName($name)
+	{
+		switch ($name)
+		{
+			case 'index' :
+				$r = 'GET %s/%s/';
+				break;
+
+			case 'store' :
+				$r = 'POST %s/%s/';
+				break;
+
+			default :
+				$methods = array(
+					'put',
+					'post',
+					'delete',
+					'get',
+				);
+				break;
+				$r = $name;
+		}
+
+		return $r;
+	}
 }

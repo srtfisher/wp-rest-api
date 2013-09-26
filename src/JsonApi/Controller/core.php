@@ -1,12 +1,15 @@
 <?php namespace JsonApi\Controller;
+//use JsonApi\Controller\ControllerInterface;
 
 class Core implements ControllerInterface {
+	public $base = 'core';
+	
 	/**
 	 * Get the Information
 	 * 
 	 * @return array
 	*/
-	public function getInfo()
+	public function controllerInfo()
 	{
 		return array(
 			'name' => 'Core',

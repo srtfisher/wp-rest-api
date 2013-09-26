@@ -121,6 +121,19 @@ function json_api_dir() {
 	return (defined('JSON_API_DIR') && file_exists(JSON_API_DIR)) ? JSON_API_DIR : __DIR__;
 }
 
+/**
+ * Setup the Default Controllers
+ *
+ * @access  private
+ */
+function wp_rest_api_default_controllers($collection)
+{
+	$collection->register(new JsonApi\Controller\Core);
+	$collection->register(new JsonApi\Controller\Posts);
+}
+
+add_action('wp-rest-api-controllers', 'wp_rest_api_default_controllers');
+
 // Add initialization and activation hooks
 add_action('init', 'json_api_init');
 register_activation_hook("$dir/json-api.php", 'json_api_activation');

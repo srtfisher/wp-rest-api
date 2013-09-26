@@ -1,7 +1,9 @@
 <?php namespace JsonApi\Controller;
 
 class Posts extends BaseController implements ControllerInterface {
-	public function getInfo()
+	public $base = 'posts';
+	
+	public function controllerInfo()
 	{
 		return array(
 			'name' => 'Posts',

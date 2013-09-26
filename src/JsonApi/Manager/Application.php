@@ -1,7 +1,8 @@
 <?php namespace JsonApi\Manager;
 
 use Symfony\Component\HttpFoundation\Request,
-	Symfony\Component\HttpFoundation\Response;
+	Symfony\Component\HttpFoundation\Response,
+	JsonApi\Manager\Collection;
 
 /**
  * JSON API Manager
@@ -133,8 +134,9 @@ class Application {
 	 *
 	 * Called on `admin_menu`
 	 */
-	public function admin_menu() {
-		add_options_page('JSON API Settings', 'JSON API', 'manage_options', 'json-api', array(&$this, 'admin_options'));
+	public function admin_menu()
+	{
+		add_options_page('WP REST API Settings', 'REST API', 'manage_options', 'json-api', array(&$this, 'admin_options'));
 	}
 	
 	/**
@@ -144,59 +146,55 @@ class Application {
 	 * @access  private
 	 */
 	public function admin_options() {
-		if (!current_user_can('manage_options'))  {
+		if (! current_user_can('manage_options'))
 			wp_die( __('You do not have sufficient permissions to access this page.') );
-		}
 		
-		$available_controllers = $this->get_controllers();
-		$active_controllers = explode(',', get_option('json_api_controllers', 'core'));
-		
-		if (count($active_controllers) == 1 && empty($active_controllers[0])) {
-			$active_controllers = array();
-		}
-		
-		if (!empty($_REQUEST['_wpnonce']) && wp_verify_nonce($_REQUEST['_wpnonce'], "update-options")) {
-			if ((!empty($_REQUEST['action']) || !empty($_REQUEST['action2'])) &&
-					(!empty($_REQUEST['controller']) || !empty($_REQUEST['controllers']))) {
-				if (!empty($_REQUEST['action'])) {
-					$action = $_REQUEST['action'];
-				} else {
-					$action = $_REQUEST['action2'];
-				}
-				
-				if (!empty($_REQUEST['controllers'])) {
-					$controllers = $_REQUEST['controllers'];
-				} else {
-					$controllers = array($_REQUEST['controller']);
-				}
-				
-				foreach ($controllers as $controller) {
-					if (in_array($controller, $available_controllers)) {
-						if ($action == 'activate' && !in_array($controller, $active_controllers)) {
-							$active_controllers[] = $controller;
-						} else if ($action == 'deactivate') {
-							$index = array_search($controller, $active_controllers);
-							if ($index !== false) {
-								unset($active_controllers[$index]);
-							}
-						}
-					}
-				}
-				$this->save_option('json_api_controllers', implode(',', $active_controllers));
+		if (isset($_GET['_wpnonce']) AND isset($_GET['action']) AND isset($_GET['controller']) AND wp_verify_nonce($_REQUEST['_wpnonce'], "update-options")) :
+			$controllers = $this->activeControllers();
+			$settings = Settings::Instance();
+
+			switch ($_GET['action'])
+			{
+				case 'activate' :
+					if (! in_array($_GET['controller'], $controllers))
+						$controllers[] = $_GET['controller'];
+
+					$settings->active_controllers = $controllers;
+					$settings->save();
+
+					?><div class="updated"><p><?php _e('Controller activated.'); ?></p></div><?php
+					break;
+
+				case 'deactivate' :
+					foreach ($controllers as $key => $name) :
+						if ($name == $_GET['controller'])
+							unset($controllers[$key]);
+					endforeach;
+
+					$settings->active_controllers = $controllers;
+					$settings->save();
+
+					?><div class="updated"><p><?php _e('Controller deactivated.'); ?></p></div><?php
+					break;
+
 			}
-			if (isset($_REQUEST['json_api_base'])) {
-				$this->save_option('json_api_base', $_REQUEST['json_api_base']);
-			}
-		}
-		
+		elseif (isset($_POST['wp-rest-api-base']) AND wp_verify_nonce($_REQUEST['_wpnonce'], "update-options")) :
+			$settings = Settings::Instance();
+			$settings->base = sanitize_title_with_dashes($_POST['wp-rest-api-base']);
+			$settings->save();
+
+			?><div class="updated"><p><?php _e('API Base Updated.'); ?></p></div><?php
+		endif;
+
+		$available_controllers = $this->allControllers();
 		?>
 <div class="wrap">
 	<div id="icon-options-general" class="icon32"><br /></div>
-	<h2>JSON API Settings</h2>
-	<form action="options-general.php?page=json-api" method="post">
+	<h2>WP REST API Settings</h2>
+	<form action="<?php echo admin_url('options-general.php?page=json-api'); ?>" method="post">
 		<?php wp_nonce_field('update-options'); ?>
 		<h3>Controllers</h3>
-		<?php $this->print_controller_actions(); ?>
+
 		<table id="all-plugins-table" class="widefat">
 			<thead>
 				<tr>
@@ -215,12 +213,12 @@ class Application {
 			<tbody class="plugins">
 				<?php
 				
-				foreach ($available_controllers as $controller) {
+				foreach ($available_controllers as $controllerName => $controller) {
 					
 					$error = false;
-					$active = in_array($controller, $active_controllers);
-					$info = $this->controller_info($controller);
-					
+					$active = $controller['active'];
+					$info = $controller['object']->controllerInfo();
+
 					if (is_string($info)) {
 						$active = false;
 						$error = true;
@@ -243,9 +241,9 @@ class Application {
 								<?php
 								
 								if ($active) {
-									echo '<a href="' . wp_nonce_url('options-general.php?page=json-api&amp;action=deactivate&amp;controller=' . $controller, 'update-options') . '" title="' . __('Deactivate this controller') . '" class="edit">' . __('Deactivate') . '</a>';
+									echo '<a href="' . wp_nonce_url('options-general.php?page=json-api&amp;action=deactivate&amp;controller=' . $controllerName, 'update-options') . '" title="' . __('Deactivate this controller') . '" class="edit">' . __('Deactivate') . '</a>';
 								} else if (!$error) {
-									echo '<a href="' . wp_nonce_url('options-general.php?page=json-api&amp;action=activate&amp;controller=' . $controller, 'update-options') . '" title="' . __('Activate this controller') . '" class="edit">' . __('Activate') . '</a>';
+									echo '<a href="' . wp_nonce_url('options-general.php?page=json-api&amp;action=activate&amp;controller=' . $controllerName, 'update-options') . '" title="' . __('Activate this controller') . '" class="edit">' . __('Activate') . '</a>';
 								}
 									
 								if ($info['url']) {
@@ -259,8 +257,8 @@ class Application {
 							<p><?php echo $info['description']; ?></p>
 							<p>
 								<?php
-								
-								foreach($info['methods'] as $method) {
+								/*
+								foreach(get_class_methods($controller['object']) as $method) {
 									$url = $this->get_method_url($controller, $method, array('dev' => 1));
 									if ($active) {
 										echo "<code><a href=\"$url\">$method</a></code> ";
@@ -268,7 +266,7 @@ class Application {
 										echo "<code>$method</code> ";
 									}
 								}
-								
+								*/
 								?>
 							</p>
 						</td>
@@ -276,13 +274,13 @@ class Application {
 				<?php } ?>
 			</tbody>
 		</table>
-		<?php $this->print_controller_actions('action2'); ?>
+		<?php //$this->print_controller_actions('action2'); ?>
 		<h3>Address</h3>
-		<p>Specify a base URL for JSON API. For example, using <code>api</code> as your API base URL would enable the following <code><?php bloginfo('url'); ?>/api/get_recent_posts/</code>. If you assign a blank value the API will only be available by setting a <code>json</code> query variable.</p>
+		<p>Specify a base URL for JSON API. For example, using <code>api</code> as your API base URL would enable the following <code><?php bloginfo('url'); ?>/api/posts/</code>. If you assign a blank value, the API will only be available by setting a <code>json</code> query variable.</p>
 		<table class="form-table">
 			<tr valign="top">
 				<th scope="row">API base</th>
-				<td><code><?php bloginfo('url'); ?>/</code><input type="text" name="json_api_base" value="<?php echo get_option('json_api_base', 'api'); ?>" size="15" /></td>
+				<td><code><?php bloginfo('url'); ?>/</code><input type="text" name="wp-rest-api-base" value="<?php echo Settings::Instance()->base; ?>" size="15" /></td>
 			</tr>
 		</table>
 		<?php if (!get_option('permalink_structure', '')) { ?>
@@ -347,19 +345,6 @@ class Application {
 		} else {
 			add_option($id, $value);
 		}
-	}
-	
-	public function get_controllers() {
-		$controllers = array();
-		$dir = json_api_dir();
-		$dh = opendir("$dir/controllers");
-		while ($file = readdir($dh)) {
-			if (preg_match('/(.+)\.php$/', $file, $matches)) {
-				$controllers[] = $matches[1];
-			}
-		}
-		$controllers = apply_filters('json_api_controllers', $controllers);
-		return array_map('strtolower', $controllers);
 	}
 	
 	function controller_is_active($controller) {
@@ -460,14 +445,16 @@ class Application {
 	 */
 	public function allControllers()
 	{
-		$controllers = (array) apply_filters('rest-api', array());
+		$collection = new Collection;
+		$controllers = (array) $collection->getControllers();
 
 		if (count($controllers) == 0) return array();
 
 		$index = array();
 		foreach ($controllers as $c) :
-			$index[get_class($c)] = array(
-				'active' => (boolean) $this->controllerActive($c),
+			$name = $c->base;
+			$index[$name] = array(
+				'active' => (boolean) $this->isControllerActive($name),
 				'object' => $c
 			);
 		endforeach;
@@ -483,5 +470,16 @@ class Application {
 	public function activeControllers()
 	{
 		return (array) Settings::Instance()->active_controllers;
+	}
+
+	/**
+	 * Determine if a controller is active
+	 * 
+	 * @param string
+	 * @return boolean
+	 */
+	public function isControllerActive($name)
+	{
+		return (in_array($name, $this->activeControllers()));
 	}
 }

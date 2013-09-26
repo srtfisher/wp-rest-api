@@ -1,5 +1,5 @@
-<?php namespace Plex\Controller;
+<?php namespace JsonApi\Controller;
 
 interface ControllerInterface {
-	public function getInfo();
+	public function controllerInfo();
 }
