@@ -182,7 +182,8 @@ class Application {
 			$settings = Settings::Instance();
 			$settings->base = sanitize_title_with_dashes($_POST['wp-rest-api-base']);
 			$settings->save();
-
+			$this->flush_rewrite_rules();
+			
 			?><div class="updated"><p><?php _e('API Base Updated.'); ?></p></div><?php
 		endif;
 
@@ -212,7 +213,6 @@ class Application {
 			</tfoot>
 			<tbody class="plugins">
 				<?php
-				
 				foreach ($available_controllers as $controllerName => $controller) {
 					
 					$error = false;
@@ -255,26 +255,11 @@ class Application {
 						</td>
 						<td class="desc">
 							<p><?php echo $info['description']; ?></p>
-							<p>
-								<?php
-								/*
-								foreach(get_class_methods($controller['object']) as $method) {
-									$url = $this->get_method_url($controller, $method, array('dev' => 1));
-									if ($active) {
-										echo "<code><a href=\"$url\">$method</a></code> ";
-									} else {
-										echo "<code>$method</code> ";
-									}
-								}
-								*/
-								?>
-							</p>
 						</td>
 					</tr>
 				<?php } ?>
 			</tbody>
 		</table>
-		<?php //$this->print_controller_actions('action2'); ?>
 		<h3>Address</h3>
 		<p>Specify a base URL for JSON API. For example, using <code>api</code> as your API base URL would enable the following <code><?php bloginfo('url'); ?>/api/posts/</code>. If you assign a blank value, the API will only be available by setting a <code>json</code> query variable.</p>
 		<table class="form-table">
@@ -293,118 +278,6 @@ class Application {
 	</form>
 </div>
 <?php
-	}
-	
-	function print_controller_actions($name = 'action') {
-		?>
-		<div class="tablenav">
-			<div class="alignleft actions">
-				<select name="<?php echo $name; ?>">
-					<option selected="selected" value="-1">Bulk Actions</option>
-					<option value="activate">Activate</option>
-					<option value="deactivate">Deactivate</option>
-				</select>
-				<input type="submit" class="button-secondary action" id="doaction" name="doaction" value="Apply">
-			</div>
-			<div class="clear"></div>
-		</div>
-		<div class="clear"></div>
-		<?php
-	}
-	
-	function get_method_url($controller, $method, $options = '') {
-		$url = get_bloginfo('url');
-		$base = get_option('json_api_base', 'api');
-		$permalink_structure = get_option('permalink_structure', '');
-		if (!empty($options) && is_array($options)) {
-			$args = array();
-			foreach ($options as $key => $value) {
-				$args[] = urlencode($key) . '=' . urlencode($value);
-			}
-			$args = implode('&', $args);
-		} else {
-			$args = $options;
-		}
-		if ($controller != 'core') {
-			$method = "$controller/$method";
-		}
-		if (!empty($base) && !empty($permalink_structure)) {
-			if (!empty($args)) {
-				$args = "?$args";
-			}
-			return "$url/$base/$method/$args";
-		} else {
-			return "$url?json=$method&$args";
-		}
-	}
-	
-	public function save_option($id, $value) {
-		$option_exists = (get_option($id, null) !== null);
-		if ($option_exists) {
-			update_option($id, $value);
-		} else {
-			add_option($id, $value);
-		}
-	}
-	
-	function controller_is_active($controller) {
-		if (defined('JSON_API_CONTROLLERS')) {
-			$default = JSON_API_CONTROLLERS;
-		} else {
-			$default = 'core';
-		}
-		$active_controllers = explode(',', get_option('json_api_controllers', $default));
-		return (in_array($controller, $active_controllers));
-	}
-	
-	public function update_controllers($controllers) {
-		if (is_array($controllers)) {
-			return implode(',', $controllers);
-		} else {
-			return $controllers;
-		}
-	}
-	
-	public function controller_info($controller) {
-		$path = $this->controller_path($controller);
-		$class = $this->controller_class($controller);
-		$response = array(
-			'name' => $controller,
-			'description' => '(No description available)',
-			'methods' => array()
-		);
-		if (file_exists($path)) {
-			$source = file_get_contents($path);
-			if (preg_match('/^\s*Controller name:(.+)$/im', $source, $matches)) {
-				$response['name'] = trim($matches[1]);
-			}
-			if (preg_match('/^\s*Controller description:(.+)$/im', $source, $matches)) {
-				$response['description'] = trim($matches[1]);
-			}
-			if (preg_match('/^\s*Controller URI:(.+)$/im', $source, $matches)) {
-				$response['docs'] = trim($matches[1]);
-			}
-			if (!class_exists($class)) {
-				require_once($path);
-			}
-			$response['methods'] = get_class_methods($class);
-			return $response;
-		} else if (is_admin()) {
-			return "Cannot find controller class '$class' (filtered path: $path).";
-		} else {
-			$this->error("Unknown controller '$controller'.");
-		}
-		return $response;
-	}
-	
-	public function controller_class($controller) {
-		return "json_api_{$controller}_controller";
-	}
-	
-	public function controller_path($controller) {
-		$dir = json_api_dir();
-		$controller_class = $this->controller_class($controller);
-		return apply_filters("{$controller_class}_path", "$dir/controllers/$controller.php");
 	}
 	
 	public function get_nonce_id($controller, $method) {

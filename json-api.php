@@ -8,8 +8,9 @@ Author: Dan Phiffer
 Author URI: http://phiffer.org/
 */
 
-use JsonApi\Manager\Application;
-
+use JsonApi\Manager\Application,
+	JsonApi\Manager\Settings;
+	
 $dir = json_api_dir();
 if (! file_exists($dir.'/vendor/autoload.php')) :
 	echo "Composer not setup for REST API";
@@ -98,7 +99,11 @@ function json_api_deactivation() {
  * @access private
  */
 function json_api_rewrites($wp_rules) {
-	$base = get_option('json_api_base', 'api');
+	$settings = Settings::Instance();
+
+	if (! $settings->base) return;
+	$base = $settings->base;
+
 	if (empty($base)) {
 		return $wp_rules;
 	}
