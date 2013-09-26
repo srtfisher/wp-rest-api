@@ -8,10 +8,17 @@ Author: Dan Phiffer
 Author URI: http://phiffer.org/
 */
 
-use JsonAPi\Manager\Application;
+use JsonApi\Manager\Application;
 
 $dir = json_api_dir();
+if (! file_exists($dir.'/vendor/autoload.php')) :
+	echo "Composer not setup for REST API";
+	return;
+else :
+	require_once $dir.'/vendor/autoload.php';
+endif;
 
+/*
 require_once $dir . '/singletons/api.php';
 require_once $dir . '/singletons/query.php';
 require_once $dir . '/singletons/introspector.php';
@@ -22,7 +29,7 @@ require_once $dir . '/models/category.php';
 require_once $dir . '/models/tag.php';
 require_once $dir . '/models/author.php';
 require_once $dir . '/models/attachment.php';
-
+*/
 /**
  * Initialize the Plugin
  * 
@@ -34,12 +41,12 @@ function json_api_init() {
 	if (phpversion() < 5.3)
 		return add_action('admin_notices', 'json_api_php_version_warning');
 
-	if (! class_exists('Application'))
-		return add_action('admin_notices', 'json_api_class_warning');
+	//if (! class_exists('Application'))
+	//	return add_action('admin_notices', 'json_api_class_warning');
 
 	add_filter('rewrite_rules_array', 'json_api_rewrites');
 
-	$json_api = Application::Instance();
+	Application::Instance();
 }
 
 /**
