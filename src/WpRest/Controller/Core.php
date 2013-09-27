@@ -3,6 +3,12 @@
 use WpRest\Response,
 	WpRest\Manager\Application;
 
+/**
+ * Core Controller to show information about the API
+ * 
+ * @package  wprest
+ * @subpackage  controller
+ */
 class Core extends BaseController implements ControllerInterface {
 	public $base = 'core';
 	
@@ -18,7 +24,7 @@ class Core extends BaseController implements ControllerInterface {
 			'description' => 'Basic introspection methods',
 		);
 	}
-
+	
 	/**
 	 * Core API Information
 	 *

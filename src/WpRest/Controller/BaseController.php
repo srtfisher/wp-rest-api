@@ -2,12 +2,27 @@
 
 use WpRest\Manager\ResponseObject;
 
+/**
+ * Base Controller Class
+ *
+ * Extends all useful things.
+ *
+ * @package  wprest
+ * @subpackage controller
+ */
 abstract class BaseController {
 	protected $response;
 
+	/**
+	 * Setup the new Controller
+	 *
+	 * @uses  do_action() Calls `wp-rest-api-controller-construct` with this object
+	 */
 	public function __construct()
 	{
 		$this->response = new ResponseObject;
+
+		do_action('wp-rest-api-controller-construct', $this);
 	}
 
 	/**
