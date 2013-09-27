@@ -12,7 +12,8 @@ use WpRest\Manager\ResponseObject;
  */
 abstract class BaseController {
 	protected $response;
-
+	protected $request;
+	
 	/**
 	 * Setup the new Controller
 	 *
@@ -21,6 +22,7 @@ abstract class BaseController {
 	public function __construct()
 	{
 		$this->response = new ResponseObject;
+		$this->request = \WpRest\Manager\Application::Instance()->request;
 
 		do_action('wp-rest-api-controller-construct', $this);
 	}

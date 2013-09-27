@@ -1,33 +1,35 @@
 <?php namespace WpRest\Model;
 
-class Post {
+class Post
+{
+	public $id;              // Integer
+	public $type;            // String
+	public $slug;            // String
+	public $url;             // String
+	public $status;          // String ("draft", "published", or "pending")
+	public $title;           // String
+	public $title_plain;     // String
+	public $content;         // String (modified by read_more query var)
+	public $excerpt;         // String
+	public $date;            // String (modified by date_format query var)
+	public $modified;        // String (modified by date_format query var)
+	public $categories;      // Array of objects
+	public $tags;            // Array of objects
+	public $author;          // Object
+	public $comments;        // Array of objects
+	public $attachments;     // Array of objects
+	public $comment_count;   // Integer
+	public $comment_status;  // String ("open" or "closed")
+	public $thumbnail;       // String
+	public $custom_fields;   // Object (included by using custom_fields query var)
 	
-	// Note:
-	//   JSON_API_Post objects must be instantiated within The Loop.
-	
-	var $id;              // Integer
-	var $type;            // String
-	var $slug;            // String
-	var $url;             // String
-	var $status;          // String ("draft", "published", or "pending")
-	var $title;           // String
-	var $title_plain;     // String
-	var $content;         // String (modified by read_more query var)
-	var $excerpt;         // String
-	var $date;            // String (modified by date_format query var)
-	var $modified;        // String (modified by date_format query var)
-	var $categories;      // Array of objects
-	var $tags;            // Array of objects
-	var $author;          // Object
-	var $comments;        // Array of objects
-	var $attachments;     // Array of objects
-	var $comment_count;   // Integer
-	var $comment_status;  // String ("open" or "closed")
-	var $thumbnail;       // String
-	var $custom_fields;   // Object (included by using custom_fields query var)
-	
-	function __construct($wp_post = null) {
-		if (!empty($wp_post)) {
+	protected $introspector;
+
+	public function __construct($wp_post = null)
+	{
+		$this->introspector = \WpRest\Manager\Application::Instance()->introspector;
+
+		if (! empty($wp_post)) {
 			$this->import_wp_object($wp_post);
 		}
 	}
@@ -74,7 +76,7 @@ class Post {
 		}
 		
 		if (!empty($values['author'])) {
-			$author = $json_api->introspector->get_author_by_login($values['author']);
+			$author = $introspector->get_author_by_login($values['author']);
 			$wp_values['post_author'] = $author->id;
 		}
 		
@@ -82,7 +84,7 @@ class Post {
 			$categories = explode(',', $values['categories']);
 			foreach ($categories as $category_slug) {
 				$category_slug = trim($category_slug);
-				$category = $json_api->introspector->get_category_by_slug($category_slug);
+				$category = $this->introspector->get_category_by_slug($category_slug);
 				if (empty($wp_values['post_category'])) {
 					$wp_values['post_category'] = array($category->id);
 				} else {
@@ -124,8 +126,13 @@ class Post {
 		return $this->id;
 	}
 	
-	function import_wp_object($wp_post) {
-		global $json_api, $post;
+	/**
+	 * Import from WP_Post
+	 * 
+	 * @param WP_Post
+	 */
+	protected function import_wp_object($wp_post)
+	{
 		$date_format = $json_api->query->date_format;
 		$this->id = (int) $wp_post->ID;
 		setup_postdata($wp_post);
@@ -150,9 +157,9 @@ class Post {
 		$this->set_custom_fields_value();
 	}
 	
-	function set_value($key, $value) {
+	public function set_value($key, $value) {
 		global $json_api;
-		if ($json_api->include_value($key)) {
+		if ($this->include_value($key)) {
 			$this->$key = $value;
 		} else {
 			unset($this->$key);
@@ -161,7 +168,7 @@ class Post {
 		
 	function set_content_value() {
 		global $json_api;
-		if ($json_api->include_value('content')) {
+		if ($this->include_value('content')) {
 			$content = get_the_content($json_api->query->read_more);
 			$content = apply_filters('the_content', $content);
 			$content = str_replace(']]>', ']]&gt;', $content);
@@ -173,11 +180,11 @@ class Post {
 	
 	function set_categories_value() {
 		global $json_api;
-		if ($json_api->include_value('categories')) {
+		if ($this->include_value('categories')) {
 			$this->categories = array();
 			if ($wp_categories = get_the_category($this->id)) {
 				foreach ($wp_categories as $wp_category) {
-					$category = new JSON_API_Category($wp_category);
+					$category = new Category($wp_category);
 					if ($category->id == 1 && $category->slug == 'uncategorized') {
 						// Skip the 'uncategorized' category
 						continue;
@@ -192,7 +199,7 @@ class Post {
 	
 	function set_tags_value() {
 		global $json_api;
-		if ($json_api->include_value('tags')) {
+		if ($this->include_value('tags')) {
 			$this->tags = array();
 			if ($wp_tags = get_the_tags($this->id)) {
 				foreach ($wp_tags as $wp_tag) {
@@ -206,8 +213,8 @@ class Post {
 	
 	function set_author_value($author_id) {
 		global $json_api;
-		if ($json_api->include_value('author')) {
-			$this->author = new JSON_API_Author($author_id);
+		if ($this->include_value('author')) {
+			$this->author = new Author($author_id);
 		} else {
 			unset($this->author);
 		}
@@ -215,17 +222,16 @@ class Post {
 	
 	function set_comments_value() {
 		global $json_api;
-		if ($json_api->include_value('comments')) {
-			$this->comments = $json_api->introspector->get_comments($this->id);
-		} else {
+		if ($this->include_value('comments'))
+			$this->comments = $this->introspector->get_comments($this->id);
+		else
 			unset($this->comments);
-		}
 	}
 	
 	function set_attachments_value() {
 		global $json_api;
-		if ($json_api->include_value('attachments')) {
-			$this->attachments = $json_api->introspector->get_attachments($this->id);
+		if ($this->include_value('attachments')) {
+			$this->attachments = $this->introspector->get_attachments($this->id);
 		} else {
 			unset($this->attachments);
 		}
@@ -233,7 +239,7 @@ class Post {
 	
 	function set_thumbnail_value() {
 		global $json_api;
-		if (!$json_api->include_value('thumbnail') ||
+		if (!$this->include_value('thumbnail') ||
 				!function_exists('get_post_thumbnail_id')) {
 			unset($this->thumbnail);
 			return;
@@ -250,7 +256,7 @@ class Post {
 	
 	function set_custom_fields_value() {
 		global $json_api;
-		if ($json_api->include_value('custom_fields') &&
+		if ($this->include_value('custom_fields') &&
 				$json_api->query->custom_fields) {
 			$keys = explode(',', $json_api->query->custom_fields);
 			$wp_custom_fields = get_post_custom($this->id);
@@ -278,4 +284,8 @@ class Post {
 		return 'thumbnail';
 	}
 	
+	public function include_value($key)
+	{
+		return true;
+	}
 }

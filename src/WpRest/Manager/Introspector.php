@@ -1,5 +1,12 @@
 <?php namespace WpRest\Manager;
 
+use WpRest\Model\Comment,
+	WpRest\Model\Attachment,
+	WpRest\Model\Author,
+	WpRest\Model\Category,
+	WpRest\Model\Post,
+	WpRest\Model\Tag;
+
 class Introspector {
   
   public function get_posts($query = false, $wp_posts = false) {
@@ -205,7 +212,7 @@ class Introspector {
     ", $post_id));
     $comments = array();
     foreach ($wp_comments as $wp_comment) {
-      $comments[] = new JSON_API_Comment($wp_comment);
+      $comments[] = new Comment($wp_comment);
     }
     return $comments;
   }

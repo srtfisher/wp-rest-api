@@ -26,9 +26,25 @@ class Posts extends BaseController implements ControllerInterface {
 		return $this->posts_result($posts);
 	}
 
+	/**
+	 * GET /posts/{id}
+	 */
 	public function getSingle($id = 0)
 	{
-		return Response::json(['id' => (int) $id]);
+		$id = (int) $id;
+		
+		if ($id < 1) :
+			// Find the post by another variable
+					
+		endif;
+
+		$post = get_post($id);
+		if (! $post)
+			return $this->error(404);
+
+		return $this->response->json(array(
+			'post' => new \WpRest\Model\Post($post)
+		));
 	}
 
 	/**
