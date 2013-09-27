@@ -117,7 +117,7 @@ class Application {
 		// Hook onto this request
 		do_action('wp-rest-api-controller-'.$controller, compact('method', 'arguments'));
 		do_action('wp-rest-api-controller-'.$controller.'-method-'.$method, $arguments);
-		
+
 		// Do the response here
 		$response = call_user_func_array(array($object, $method), $arguments);
 
@@ -132,29 +132,6 @@ class Application {
 		exit;
 	}
 	
-	
-	
-	public function get_nonce_id($controller, $method) {
-		$controller = strtolower($controller);
-		$method = strtolower($method);
-		return "json_api-$controller-$method";
-	}
-	
-	public function flush_rewrite_rules() {
-		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
-	}
-	
-	public function error($message = 'Unknown error', $status = 'error') {
-		$this->response->respond(array(
-			'error' => $message
-		), $status);
-	}
-	
-	public function include_value($key) {
-		return $this->response->is_value_included($key);
-	}
-
 	/**
 	 * Determine the Controllers
 	 *
