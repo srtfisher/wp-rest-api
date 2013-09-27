@@ -19,6 +19,8 @@ class Router {
 		$controller = $method = $arguments = '';
 
 		$count = count($explode);
+
+		// Some hard logic.
 		if ($count == 0 OR ($count == 1 AND $explode[0] == '')) :
 			$controller = $this->defaultController();
 			$method = 'index';
@@ -55,5 +57,41 @@ class Router {
 	protected function defaultController()
 	{
 		return apply_filters('wp-rest-api-default-controller', 'core');
+	}
+
+	/**
+	 * Get the Controller
+	 *
+	 * @return  string
+	 */
+	public function getController()
+	{
+		return strtolower($this->requestStructured['controller']);
+	}
+
+	/**
+	 * Get the Method
+	 *
+	 * @return  string
+	 */
+	public function getMethod()
+	{
+		$input = ucfirst(strtolower($this->requestStructured['method']));
+		$input = str_replace('-', '_', $input);
+		
+		// Get the request
+		$request = Application::Instance()->request;
+		$method = strtolower($request->server->get('REQUEST_METHOD'));
+		return $method.$input;
+	}
+
+	/**
+	 * Get the Arguments
+	 *
+	 * @return array
+	 */
+	public function getArguments()
+	{
+		return (array) $this->requestStructured['arguments'];
 	}
 }

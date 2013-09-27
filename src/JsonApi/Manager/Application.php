@@ -23,14 +23,14 @@ class Application {
 	 *
 	 * @var Symfony\Component\HttpFoundation\Request
 	 */
-	protected $request;
+	public $request;
 
 	/**
 	 * Response Object
 	 *
 	 * @var Symfony\Component\HttpFoundation\Response
 	 */
-	protected $response;
+	public $response;
 
 	/**
 	 * Construct the JSON API
@@ -88,54 +88,37 @@ class Application {
 		// Not in the area, ignore.
 		if (! $this->router->isApiRequest()) return;
 
-		exit;
 		// Check to see if there's an appropriate API controller + method    
-		$controller = strtolower($this->query->get_controller());
-		$available_controllers = $this->get_controllers();
-		$enabled_controllers = explode(',', get_option('json_api_controllers', 'core'));
-		$active_controllers = array_intersect($available_controllers, $enabled_controllers);
+		$controller = $this->router->getController();
 		
-		if ($controller) {
-			
-			if (! in_array($controller, $active_controllers)) {
-				$this->error("Unknown controller '$controller'.");
-			}
-			
-			$controller_path = $this->controller_path($controller);
-			if (file_exists($controller_path)) {
-				require_once $controller_path;
-			}
-			$controller_class = $this->controller_class($controller);
-			
-			if (! class_exists($controller_class)) {
-				$this->error("Unknown controller '$controller_class'.");
-			}
-			
-			$this->controller = new $controller_class();
-			$method = $this->query->get_method($controller);
-			
-			if ($method) {
-				
-				$this->response->setup();
-				
-				// Run action hooks for method
-				do_action("json_api-{$controller}-$method");
-				
-				// Error out if nothing is found
-				if ($method == '404') {
-					$this->error('Not found');
-				}
-				
-				// Run the method
-				$result = $this->controller->$method();
-				
-				// Handle the result
-				$this->response->respond($result);
-				
-				// Done!
-				exit;
-			}
-		}
+		if (! $this->isControllerActive($controller)) return;
+
+		// Let's call the controller
+		$controllers = $this->allControllers();
+
+		// Controller doesn't exist anymore? Not found.
+		if (! isset($controllers[$controller])) return;
+		$arguments = $this->router->getArguments();
+		$method = $this->router->getMethod();
+
+		$object = $controllers[$controller]['object'];
+
+		if (! method_exists($object, $method)) :
+			// Missing exception
+			if (! method_exists($object, 'missingMethodException'))
+				return;
+
+			$method = 'missingMethodException';
+		endif;
+
+		do_action('wp-rest-api-before-method-call', array($controller, $method, $arguments));
+
+		// Do the response here
+		
+		do_action('wp-rest-api-after-method-call', array($controller, $method, $arguments));
+
+		// Anddddddd we stop here!
+		exit;
 	}
 	
 	/**
