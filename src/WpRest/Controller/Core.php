@@ -32,10 +32,13 @@ class Core extends BaseController implements ControllerInterface {
 	 */
 	public function getIndex()
 	{
+		global $wp_version;
+
 		$response = array();
 		$response['status'] = 'ok';
 		$response['version'] = Application::VERSION;
 		$response['controllers'] = array_values(Application::Instance()->activeControllers());
+		$response['wp_version'] = $wp_version;
 
 		// If they are authenticated
 		$authentication = \WpRest\Manager\Authentication::Instance();
@@ -46,35 +49,8 @@ class Core extends BaseController implements ControllerInterface {
 			$response['authentication']['key'] = $authentication->requestApiKey();
 			$response['authentication']['access'] = $auth['access'];
 		endif;
-		return $this->response->json($response);
 
-		global $json_api;
-		$php = '';
-		if ( ! empty($json_api->query->controller) ) {
-			return $json_api->controller_info($json_api->query->controller);
-		} else {
-			$dir = json_api_dir();
-			if (file_exists("$dir/json-api.php")) {
-				$php = file_get_contents("$dir/json-api.php");
-			} else {
-				// Check one directory up, in case json-api.php was moved
-				$dir = dirname($dir);
-				if (file_exists("$dir/json-api.php")) {
-					$php = file_get_contents("$dir/json-api.php");
-				}
-			}
-			if (preg_match('/^\s*Version:\s*(.+)$/m', $php, $matches)) {
-				$version = $matches[1];
-			} else {
-				$version = '(Unknown)';
-			}
-			$active_controllers = explode(',', get_option('json_api_controllers', 'core'));
-			$controllers = array_intersect($json_api->get_controllers(), $active_controllers);
-			return array(
-				'json_api_version' => $version,
-				'controllers' => array_values($controllers)
-			);
-		}
+		return $this->response->json(apply_filters('wp-rest-api-info-endpoint', $response));
 	}
 	
 	public function get_recent_posts() {

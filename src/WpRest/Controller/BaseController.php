@@ -50,4 +50,16 @@ abstract class BaseController {
 	{
 		return Response::json($data, $statusCode, $headers);
 	}
+
+	/**
+	 * Make a Error response
+	 * 
+	 * @param integer
+	 * @param  string
+	 * @return object
+	 */
+	protected function error($statusCode, $message = null)
+	{
+		return \WpRest\Manager\Application::applicationError($statusCode, $message);
+	}
 }
