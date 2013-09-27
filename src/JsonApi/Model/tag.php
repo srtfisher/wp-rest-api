@@ -1,4 +1,4 @@
-<?php namespace JsonApi\Model;
+<?php namespace WpRest\Model;
 
 class Tag {
   

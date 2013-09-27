@@ -1,9 +1,9 @@
-<?php namespace JsonApi\Manager;
+<?php namespace WpRest\Manager;
 
 /**
  * Manage the Administration of the System
  *
- * @package  jsonapi
+ * @package  WpRest
  */
 class Admin {
 	public function __construct()

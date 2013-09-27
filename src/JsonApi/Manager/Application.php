@@ -1,14 +1,14 @@
-<?php namespace JsonApi\Manager;
+<?php namespace WpRest\Manager;
 
 use Symfony\Component\HttpFoundation\Request,
 	Symfony\Component\HttpFoundation\Response,
-	JsonApi\Manager\Collection,
-	JsonApi\Manager\Router;
+	WpRest\Manager\Collection,
+	WpRest\Manager\Router;
 
 /**
  * JSON API Manager
  *
- * @package  jsonapi
+ * @package  WpRest
  */
 class Application {
 	/**
@@ -28,14 +28,14 @@ class Application {
 	/**
 	 * Introspector
 	 *
-	 * @var  JsonApi\Manager\introspector
+	 * @var  WpRest\Manager\introspector
 	 */
 	public $introspector;
 
 	/**
 	 * Storage of the Admin Interface
 	 * 
-	 * @var JsonApi\Manager\Admin
+	 * @var WpRest\Manager\Admin
 	 */
 	protected $admin;
 
@@ -117,8 +117,8 @@ class Application {
 		// Do the response here
 		$response = call_user_func_array(array($object, $method), $arguments);
 
-		if (! ( $response instanceof \JsonApi\Response ) AND !( $response instanceof \Symfony\Component\HttpFoundation ) )
-			$response = \JsonApi\Response::make($response);
+		if (! ( $response instanceof \WpRest\Response ) AND !( $response instanceof \Symfony\Component\HttpFoundation ) )
+			$response = \WpRest\Response::make($response);
 
 		$response->send();
 
@@ -213,7 +213,7 @@ class Application {
 		if (has_action('wp-rest-api-'.$statusCode))
 			return do_action('wp-rest-api-'.$statusCode, $message);
 
-		\JsonApi\Response::json(array(
+		\WpRest\Response::json(array(
 			'status' => 'error',
 			'message' => $message,
 		), $statusCode)->send();

@@ -1,4 +1,4 @@
-<?php namespace JsonApi;
+<?php namespace WpRest;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse,
 	Symfony\Component\HttpFoundation\Response as ResponseBase;

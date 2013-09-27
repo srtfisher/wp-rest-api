@@ -1,4 +1,4 @@
-<?php namespace JsonApi\Manager;
+<?php namespace WpRest\Manager;
 
 class Query {
 	

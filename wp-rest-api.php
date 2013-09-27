@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: JSON API
+Plugin Name: WP REST API
 Plugin URI: http://wordpress.org/extend/plugins/json-api/
 Description: A RESTful API for WordPress
 Version: 1.1
@@ -8,8 +8,8 @@ Author: Dan Phiffer
 Author URI: http://phiffer.org/
 */
 
-use JsonApi\Manager\Application,
-	JsonApi\Manager\Settings;
+use WpRest\Manager\Application,
+	WpRest\Manager\Settings;
 
 if (! file_exists(__DIR__.'/vendor/autoload.php')) :
 	echo "Composer not setup for REST API";
@@ -47,8 +47,8 @@ function json_api_php_version_warning() {
  */
 function wp_rest_api_default_controllers($collection)
 {
-	$collection->register(new JsonApi\Controller\Core);
-	$collection->register(new JsonApi\Controller\Posts);
+	$collection->register(new WpRest\Controller\Core);
+	$collection->register(new WpRest\Controller\Posts);
 }
 add_action('wp-rest-api-controllers', 'wp_rest_api_default_controllers');
 

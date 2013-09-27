@@ -1,6 +1,6 @@
-<?php namespace JsonApi\Controller;
+<?php namespace WpRest\Controller;
 
-use JsonApi\Response;
+use WpRest\Response;
 
 class Core extends BaseController implements ControllerInterface {
 	public $base = 'core';

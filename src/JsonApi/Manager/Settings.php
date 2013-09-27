@@ -1,10 +1,10 @@
-<?php namespace JsonApi\Manager;
+<?php namespace WpRest\Manager;
 
 class Settings {
 	/**
 	 * Instance of this Class
 	 * 
-	 * @var JsonApi\Manager\Settings
+	 * @var WpRest\Manager\Settings
 	 */
 	protected static $Instance;
 
@@ -32,7 +32,7 @@ class Settings {
 	/**
 	 * Return the Global Instance of Settings
 	 *
-	 * @return JsonApi\Manager\Settings
+	 * @return WpRest\Manager\Settings
 	 */
 	public static function Instance()
 	{

@@ -1,4 +1,4 @@
-<?php namespace JsonApi\Controller;
+<?php namespace WpRest\Controller;
 
 class Posts extends BaseController implements ControllerInterface {
 	public $base = 'posts';

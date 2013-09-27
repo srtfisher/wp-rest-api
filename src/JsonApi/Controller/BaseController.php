@@ -1,4 +1,4 @@
-<?php namespace JsonApi\Controller;
+<?php namespace WpRest\Controller;
 
 abstract class BaseController {
 	/**

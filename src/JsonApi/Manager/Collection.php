@@ -1,6 +1,6 @@
-<?php namespace JsonApi\Manager;
+<?php namespace WpRest\Manager;
 
-use JsonApi\Controller\ControllerInterface;
+use WpRest\Controller\ControllerInterface;
 
 /**
  * Manager the controllers and store them all
