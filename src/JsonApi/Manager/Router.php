@@ -12,6 +12,8 @@ class Router {
 
 	public function runMatches()
 	{
+		$settings = Settings::Instance();
+		$base = (isset($settings->base)) ? $settings->base : 'api';
 		preg_match('~/api/?(.*?)$~', $_SERVER['REQUEST_URI'], $this->rawRequest);
 
 		$this->requestStructured = array();

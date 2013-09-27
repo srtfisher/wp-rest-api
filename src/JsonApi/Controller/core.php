@@ -1,6 +1,8 @@
 <?php namespace JsonApi\Controller;
 
-class Core implements ControllerInterface {
+use JsonApi\Response;
+
+class Core extends BaseController implements ControllerInterface {
 	public $base = 'core';
 	
 	/**
@@ -21,7 +23,10 @@ class Core implements ControllerInterface {
 	 *
 	 * GET /core/info
 	 */
-	public function getInfo() {
+	public function getIndex()
+	{
+		return Response::json(['status' => 'ok']);
+
 		global $json_api;
 		$php = '';
 		if ( ! empty($json_api->query->controller) ) {
