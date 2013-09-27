@@ -14,6 +14,14 @@ class Router {
 	{
 		$settings = Settings::Instance();
 		$base = (isset($settings->base)) ? $settings->base : 'api';
+		$request = Application::Instance()->request;
+		$request_url = $request->server->get('REQUEST_URI');
+
+		if (strpos($request_url, '?')) :
+			$explodeRequest = explode('?', $request_url);
+			$request_url = $explodeRequest[0];
+		endif;
+
 		preg_match('~/api/?(.*?)$~', $_SERVER['REQUEST_URI'], $this->rawRequest);
 
 		$this->requestStructured = array();
@@ -45,6 +53,7 @@ class Router {
 			$arguments = explode('/', $arguments);
 
 		$this->requestStructured = compact('controller', 'method', 'arguments');
+		var_dump($this->requestStructured);exit;
 	}
 
 	/**

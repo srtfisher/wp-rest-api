@@ -56,7 +56,6 @@ class Application {
 			$_SERVER
 		);
 
-		$this->router = new Router;
 		$this->introspector = new Introspector();
 		$this->admin = new Admin();
 
@@ -83,6 +82,9 @@ class Application {
 	 */
 	public function template_redirect()
 	{
+		// Start the routing
+		$this->router = new Router;
+
 		// Not in the area, ignore.
 		if (! $this->router->isApiRequest()) return;
 
@@ -111,6 +113,10 @@ class Application {
 
 			$method = 'missingMethodException';
 		endif;
+
+		// Determine Authentication
+		$Authentication = Authentication::Instance();
+		$Authentication->determineUser();
 
 		do_action('wp-rest-api-before-method-call', array($controller, $method, $arguments));
 

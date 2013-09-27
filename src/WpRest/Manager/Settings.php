@@ -57,12 +57,12 @@ class Settings {
 	// =====================
 	public function __get($name)
 	{
-		return (isset($this->values[$name])) ? $this->values[$name] : null;
+		return (isset($this->values[$name])) ? apply_filters('wp-rest-api-settings-'.$name, $this->values[$name]) : null;
 	}
 
 	public function __set($name, $value)
 	{
-		return $this->values[$name] = $value;
+		return $this->values[$name] = apply_filters('wp-rest-api-settings-set-'.$name, $value);
 	}
 
 	public function __isset($name)

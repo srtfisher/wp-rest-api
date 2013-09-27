@@ -82,14 +82,14 @@ class Admin {
 		<table id="all-plugins-table" class="widefat">
 			<thead>
 				<tr>
-					<th class="manage-column check-column" scope="col"><input type="checkbox" /></th>
+					<th class="manage-column check-column" scope="col"></th>
 					<th class="manage-column" scope="col">Controller</th>
 					<th class="manage-column" scope="col">Description</th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<th class="manage-column check-column" scope="col"><input type="checkbox" /></th>
+					<th class="manage-column check-column" scope="col"></th>
 					<th class="manage-column" scope="col">Controller</th>
 					<th class="manage-column" scope="col">Description</th>
 				</tr>
@@ -114,9 +114,9 @@ class Admin {
 					?>
 					<tr class="<?php echo ($active ? 'active' : 'inactive'); ?>">
 						<th class="check-column" scope="row">
-							<input type="checkbox" name="controllers[]" value="<?php echo $controller; ?>" />
+							
 						</th>
-						<td class="plugin-title">
+						<td class="check-column plugin-title">
 							<strong><?php echo $info['name']; ?></strong>
 							<div class="row-actions-visible">
 								<?php
@@ -149,6 +149,28 @@ class Admin {
 				<td><code><?php bloginfo('url'); ?>/</code><input type="text" name="wp-rest-api-base" value="<?php echo Settings::Instance()->base; ?>" size="15" /></td>
 			</tr>
 		</table>
+
+		<h3>API Keys</h3>
+		<p><?php _e('Authentication with the WP REST API is done via API Keys. To perform a logged in request, append a API key to the request.'); ?></p></div>
+		<table class="widefat">
+			<?php foreach (array('thead', 'tfoot') as $t) : ?>
+			<<?php echo $t; ?>>
+				<tr>
+					<th class="manage-column check-column" scope="col"></th>
+					<th class="manage-column" scope="col">API Key</th>
+					<th class="manage-column" scope="col">Access</th>
+				</tr>
+			</<?php echo $t; ?>>
+			<?php endforeach; ?>
+			
+			<tbody>
+				<tr class="<?php echo ($active ? 'active' : 'inactive'); ?>">
+					<th class="check-column" scope="row"></th>
+
+				</tr>
+			</tbody>
+		</table>
+
 		<?php if (! get_option('permalink_structure', '')) : ?>
 			<br />
 			<p><strong>Note:</strong> User-friendly permalinks are not currently enabled. <a target="_blank" class="button" href="options-permalink.php">Change Permalinks</a>
