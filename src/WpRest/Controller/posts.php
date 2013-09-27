@@ -19,11 +19,13 @@ class Posts extends BaseController implements ControllerInterface {
 	 * 
 	 * GET /posts
 	 */
-	public function index()
+	public function getIndex()
 	{
-		global $json_api;
-		$posts = $json_api->introspector->get_posts();
-		return $this->posts_result($posts);
+		global $wp_query;
+		$introspector = Application::Instance()->introspector;
+		$posts = $introspector->get_posts();
+
+		return $this->response($posts);
 	}
 
 	/**
@@ -48,31 +50,87 @@ class Posts extends BaseController implements ControllerInterface {
 	}
 
 	/**
-	 * Store a new instance of a post
+	 * Search Posts
+	 *
+	 * GET /posts/search
+	 */
+	public function getSearch()
+	{
+		if (! $this->request->get('s'))
+			return $this->error(400, 'No search variable passed.');
+
+		$introspector = Application::Instance()->introspector;
+
+		$posts = $introspector->get_posts(array(
+			's' => $this->request->get('s')
+		));
+		
+		return $this->response($posts);
+	}
+
+	/**
+	 * Create a new post
 	 *
 	 * POST /posts
 	 */
-	public function postStore() {
-		global $json_api;
-		if (!current_user_can('edit_posts')) {
-			$json_api->error("You need to login with a user capable of creating posts.");
-		}
-		if (!$json_api->query->nonce) {
-			$json_api->error("You must include a 'nonce' value to create posts. Use the `get_nonce` Core API method.");
-		}
-		$nonce_id = $json_api->get_nonce_id('posts', 'create_post');
-		if (!wp_verify_nonce($json_api->query->nonce, $nonce_id)) {
-			$json_api->error("Your 'nonce' value was incorrect. Use the 'get_nonce' API method.");
-		}
-		nocache_headers();
-		$post = new JSON_API_Post();
+	public function postIndex()
+	{
+		$post = new \WpRest\Model\Post();
 		$id = $post->create($_REQUEST);
-		if (empty($id)) {
-			$json_api->error("Could not create post.");
-		}
-		return array(
-			'post' => $post
-		);
+
+		if (empty($id))
+			return $this->error("Could not create post.");
+		else
+			return $this->response->json(array(
+				'post' => $post
+			));
+	}
+
+	/**
+	 * Category listing
+	 * 
+	 * GET /posts/categories
+	 */
+	public function getCategories()
+	{
+		$introspector = Application::Instance()->introspector;
+		$categories = $introspector->get_categories();
+
+		return $this->response->json(array(
+			'count' => count($categories),
+			'categories' => $categories
+		));
+	}
+
+	/**
+	 * Create category
+	 *
+	 * POST /post/tags
+	 */
+	public function postCategories()
+	{
+
+	}
+
+	/**
+	 * GET /posts/tags
+	 */
+	public function getTags() {
+		$tags = $this->introspector->get_tags();
+		return $this->response->json(array(
+			'count' => count($tags),
+			'tags' => $tags
+		));
+	}
+
+	/**
+	 * Create new tag
+	 * 
+	 * POST /posts/tags
+	 */
+	public function postTags()
+	{
+
 	}
 	
 	/**
@@ -82,14 +140,15 @@ class Posts extends BaseController implements ControllerInterface {
 	 * @param integer
 	 * @return string
 	 */
-	public function response($data = array(), $http_code = 200)
+	public function response($data = array(), $http_code = 200, array $headers = array())
 	{
 		global $wp_query;
-		return parent::response(array(
+
+		return $this->response->json(array(
 			'count' => count($data),
 			'count_total' => (int) $wp_query->found_posts,
 			'pages' => $wp_query->max_num_pages,
-			'posts' => $posts
-		));
+			'posts' => $data
+		), $http_code, $headers);
 	}
 }

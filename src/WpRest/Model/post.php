@@ -34,7 +34,8 @@ class Post
 		}
 	}
 	
-	function create($values = null) {
+	public function create($values = null)
+	{
 		unset($values['id']);
 		if (empty($values) || empty($values['title'])) {
 			$values = array(
@@ -45,13 +46,15 @@ class Post
 		return $this->save($values);
 	}
 	
-	function update($values) {
+	public function update($values)
+	{
 		$values['id'] = $this->id;
 		return $this->save($values);
 	}
 	
-	function save($values = null) {
-		global $json_api, $user_ID;
+	public function save($values = null)
+	{
+		global $user_ID;
 		
 		$wp_values = array();
 		

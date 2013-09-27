@@ -13,6 +13,7 @@ use WpRest\Manager\ResponseObject;
 abstract class BaseController {
 	protected $response;
 	protected $request;
+	protected $introspector;
 	
 	/**
 	 * Setup the new Controller
@@ -21,36 +22,13 @@ abstract class BaseController {
 	 */
 	public function __construct()
 	{
+		$a = \WpRest\Manager\Application::Instance();
+
 		$this->response = new ResponseObject;
-		$this->request = \WpRest\Manager\Application::Instance()->request;
+		$this->request = $a->request;
+		$this->introspector = $a->introspector;
 
 		do_action('wp-rest-api-controller-construct', $this);
-	}
-
-	/**
-	 * Make a simple response
-	 * 
-	 * @param string
-	 * @param  integer
-	 * @param  array
-	 * @return object
-	 */
-	protected function response($data, $statusCode = 200, array $headers = array())
-	{
-		return Response::make($data, $statusCode, $headers);
-	}
-
-	/**
-	 * Make a JSON response
-	 * 
-	 * @param mixed
-	 * @param  integer
-	 * @param  array
-	 * @return object
-	 */
-	protected function json($data, $statusCode = 200, array $headers = array())
-	{
-		return Response::json($data, $statusCode, $headers);
 	}
 
 	/**
