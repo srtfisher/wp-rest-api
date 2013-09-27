@@ -36,7 +36,7 @@ class Posts extends BaseController implements ControllerInterface {
 	 *
 	 * POST /posts
 	 */
-	public function store() {
+	public function postStore() {
 		global $json_api;
 		if (!current_user_can('edit_posts')) {
 			$json_api->error("You need to login with a user capable of creating posts.");

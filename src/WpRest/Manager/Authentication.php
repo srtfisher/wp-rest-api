@@ -145,7 +145,7 @@ class Authentication {
 			return do_action('wp-rest-api-auth-check-'.$httpMethod, $access);
 
 		if ($level == self::NONE) return false;
-		
+
 		switch (strtolower($httpMethod))
 		{
 			case 'get' :
@@ -185,5 +185,24 @@ class Authentication {
 			self::READ_WRITE,
 			self::NONE
 		));
+	}
+
+	/**
+	 * Delete a key
+	 *
+	 * @param  string
+	 */
+	public function deleteKey($DeleteKey)
+	{
+		$keys = $this->keys();
+
+		if (isset($keys[$DeleteKey]))
+			unset($keys[$DeleteKey]);
+
+		$Settings = Settings::Instance();
+		$Settings->keys = $keys;
+		$Settings->save();
+
+		return true;
 	}
 }

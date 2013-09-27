@@ -62,6 +62,32 @@ class Admin {
 					break;
 
 			}
+		elseif ( isset($_GET['action']) AND $_GET['action'] == 'newkey' AND wp_verify_nonce($_REQUEST['_wpnonce'], "update-options")) :
+			$Authentication = Authentication::Instance();
+			$access = $_GET['access'];
+
+			if (! in_array($access, $Authentication->accessTypes()))
+				wp_die('Unknown access key type.');
+
+			$key = $Authentication->newKey($access);
+
+			?><div class="updated"><p><?php echo sprintf('%s <code>%s</code> %s <code>%s</code> %s',
+				__('Key'),
+				$key,
+				__('added with'),
+				$access,
+				__('access')
+			); ?></p></div>
+		<?php
+		elseif (isset($_GET['action']) AND $_GET['action'] = 'delkey' AND isset($_GET['key']) AND wp_verify_nonce($_REQUEST['_wpnonce'], "update-options")) :
+			Authentication::Instance()->deleteKey($_GET['key']);
+			?>
+			<div class="updated">
+				<p>
+					<?php _e('Key deleted.'); ?>
+				</p>
+			</div>
+		<?php
 		elseif (isset($_POST['wp-rest-api-base']) AND wp_verify_nonce($_REQUEST['_wpnonce'], "update-options")) :
 			$settings = Settings::Instance();
 			$settings->base = sanitize_title_with_dashes($_POST['wp-rest-api-base']);
@@ -141,16 +167,19 @@ class Admin {
 				<?php } ?>
 			</tbody>
 		</table>
-		<h3>Address</h3>
-		<p>Specify a base URL for JSON API. For example, using <code>api</code> as your API base URL would enable the following <code><?php bloginfo('url'); ?>/api/posts/</code>. If you assign a blank value, the API will only be available by setting a <code>json</code> query variable.</p>
-		<table class="form-table">
-			<tr valign="top">
-				<th scope="row">API base</th>
-				<td><code><?php bloginfo('url'); ?>/</code><input type="text" name="wp-rest-api-base" value="<?php echo Settings::Instance()->base; ?>" size="15" /></td>
-			</tr>
-		</table>
 
-		<h3>API Keys</h3>
+		<h2><?php _e('API Keys'); ?>
+			<?php
+			$auth = Authentication::Instance();
+			foreach ($auth->accessTypes() as $accessLevel) :
+				if ($accessLevel == Authentication::NONE) continue;
+				?>
+				<a href="<?php echo wp_nonce_url('options-general.php?page=json-api&action=newkey&access='.$accessLevel, 'update-options'); ?>" class="add-new-h2">
+					<?php echo sprintf('%s %s %s', __('Add New'), $accessLevel, __('Key')); ?>
+				</a>
+			<?php endforeach; ?>
+		</h2>
+
 		<p><?php _e('Authentication with the WP REST API is done via API Keys. To perform a logged in request, append a API key to the request.'); ?></p></div>
 		<table class="widefat">
 			<?php foreach (array('thead', 'tfoot') as $t) : ?>
@@ -162,13 +191,35 @@ class Admin {
 				</tr>
 			</<?php echo $t; ?>>
 			<?php endforeach; ?>
-			
-			<tbody>
-				<tr class="<?php echo ($active ? 'active' : 'inactive'); ?>">
-					<th class="check-column" scope="row"></th>
 
+			<tbody>
+				<?php
+				$keys = Authentication::keys();
+				if (count($keys) == 0) : ?>
+				<tr>
+					<th class="check-column" scope="row"></th>
+					<td colspan="2"><p><?php _e('No API Keys found.'); ?></p></td>
 				</tr>
+				<?php else : foreach ($keys as $key => $keydata) : ?>
+				<tr>
+					<th class="check-column" scope="row"></th>
+					<td>
+						<p><code><?php echo $key; ?></code></p>
+						<p><a href="<?php echo wp_nonce_url('options-general.php?page=json-api&action=delkey&key='.$key, 'update-options'); ?>"><?php _e('Delete Key'); ?></a></p>
+					</td>
+					<td><p><?php echo sprintf('%s: <code>%s</code>', __('Access'), __($keydata['access'])); ?></p></td>
+				</tr>
+				<?php endforeach; endif; ?>
 			</tbody>
+		</table>
+
+		<h3>Address</h3>
+		<p>Specify a base URL for JSON API. For example, using <code>api</code> as your API base URL would enable the following <code><?php bloginfo('url'); ?>/api/posts/</code>. If you assign a blank value, the API will only be available by setting a <code>json</code> query variable.</p>
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row">API base</th>
+				<td><code><?php bloginfo('url'); ?>/</code><input type="text" name="wp-rest-api-base" value="<?php echo Settings::Instance()->base; ?>" size="15" /></td>
+			</tr>
 		</table>
 
 		<?php if (! get_option('permalink_structure', '')) : ?>
