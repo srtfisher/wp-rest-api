@@ -53,7 +53,6 @@ class Router {
 			$arguments = explode('/', $arguments);
 
 		$this->requestStructured = compact('controller', 'method', 'arguments');
-		var_dump($this->requestStructured);exit;
 	}
 
 	/**

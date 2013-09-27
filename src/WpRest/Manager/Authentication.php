@@ -33,11 +33,11 @@ class Authentication {
 	protected static $instance;
 	
 	/**
-	 * Current User
+	 * Current acccess
 	 *
 	 * @var  object
 	 */
-	protected $user;
+	protected $access;
 
 	/**
 	 * Return the Instance of the JSON API
@@ -111,14 +111,63 @@ class Authentication {
 	}
 
 	/**
-	 * Determine the Current User from the Application Request
+	 * Determine the Current Access from the Application Request
 	 *
 	 * @return  void
 	 */
-	public function determineUser()
+	public function determineAccess()
 	{
-		$a = Application::Instance();
-		var_dump($a->request->get('apiKey'));exit;
+		if ($this->access) return $this->access;
 
+		$a = Application::Instance();
+		$key = $a->request->get('apiKey');
+
+		if (! $key) return false;
+		$keys = $this->keys();
+
+		// Unknown API Key
+		if (! isset($keys[$key]))
+			return $a->applicationError(403, 'Unauthorized API Key.');
+
+		$this->access = $keys[$key];
+		return $this->access;
+	}
+
+	/**
+	 * Determine if the current request has valid permission
+	 *
+	 * Override this access request by checking out the
+	 * `'wp-rest-api-auth-check-$httpMethod` hook.
+	 * 
+	 * @return  boolean
+	 */
+	public function determineRequestAccess()
+	{
+		$httpMethod = Application::Instance()->request->server->get('REQUEST_METHOD');
+		$access = $this->determineAccess();
+		
+		if (! $access) :
+			// Un-authed request
+			$level = self::READ;
+		else :
+			$level = $access['access'];
+		endif;
+
+		if (has_action('wp-rest-api-auth-check-'.$httpMethod))
+			return do_action('wp-rest-api-auth-check-'.$httpMethod, $access);
+
+		switch (strtolower($httpMethod))
+		{
+			case 'get' :
+				return ($level == self::READ OR $level == self::READ_WRITE);
+				break;
+
+			case 'post' :
+			case 'put' :
+			case 'delete' :
+			default :
+				return ($level == self::READ_WRITE);
+				break;
+		}
 	}
 }

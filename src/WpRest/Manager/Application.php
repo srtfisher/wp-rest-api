@@ -116,7 +116,9 @@ class Application {
 
 		// Determine Authentication
 		$Authentication = Authentication::Instance();
-		$Authentication->determineUser();
+		
+		if (! $Authentication->determineRequestAccess())
+			return $this->applicationError(403);
 
 		do_action('wp-rest-api-before-method-call', array($controller, $method, $arguments));
 
