@@ -119,7 +119,8 @@ class Authentication {
 
 		// Unknown API Key
 		if (! isset($keys[$key]))
-			return $a->applicationError(403, 'Unauthorized API Key.');
+			return \WpRest\Manager\Application::Instance()
+				->applicationError(403, 'Unauthorized API Key.');
 
 		$this->access = $keys[$key];
 		return $this->access;

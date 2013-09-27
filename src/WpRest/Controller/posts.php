@@ -21,9 +21,26 @@ class Posts extends BaseController implements ControllerInterface {
 	 */
 	public function getIndex()
 	{
-		global $wp_query;
+		$query = array();
+		$a = \WpRest\Manager\Authentication::Instance();
 		$introspector = Application::Instance()->introspector;
-		$posts = $introspector->get_posts();
+
+		$authed = $a->requestApiKey();
+		$query = $this->request->query->all();
+		$acceptableTerms = $introspector->acceptablePostSearchTerms();
+		$wpQuery = array();
+
+		if (count($query) > 0) : foreach ($query as $key => $value) :
+			if (! in_array($key, $acceptableTerms))
+				continue;
+
+			if (($key == 'type' OR $key == 'status') AND ! $authed)
+				continue;
+
+			$wpQuery[$key] = $value;
+		endforeach; endif;
+		
+		$posts = $introspector->get_posts($introspector->queryTranslate($wpQuery));
 
 		return $this->response($posts);
 	}

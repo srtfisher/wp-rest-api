@@ -9,19 +9,17 @@ use WpRest\Model\Comment,
 
 class Introspector {
 	/**
-	 * Query Poosts
+	 * Query Posts
 	 */
 	public function get_posts($query = false, $wp_posts = false) {
 		global $post;
 		query_posts($query);
+
 		$output = array();
 		while (have_posts()) {
 			the_post();
-			if ($wp_posts) {
-				$output[] = $post;
-			} else {
-				$output[] = new Post($post);
-			}
+			
+			$output[] = ($wp_posts) ? $post : new Post($post);
 		}
 		return $output;
 	}
@@ -306,5 +304,72 @@ class Introspector {
 			query_posts($query);
 		}
 	}
-	
+		
+	/**
+	 * Translate human terms to internal terms
+	 *
+	 * @param array
+	 * @return array
+	 */
+	public function queryTranslate($query)
+	{
+		$index = array();
+		foreach ($query as $key => $value) :
+			switch ($key)
+			{
+				//case 'ID' :
+				case 'comment_status' :
+				case 'ping_status' :
+				case 'to_ping' :
+				case 'pinged' :
+				case 'guid' :
+				case 'menu_order' :
+				case 'comment_count' :
+					$index[$key] = $value;
+					break;
+
+				case 'post_password' :
+				case 'password' :
+					// Can't go by password
+					break;
+				default :
+					if (strpos($key, 'post_') == false)
+						$index['post_'.$key] = $value;
+					else
+						$index[$key] = $value;
+					break;
+			}
+		endforeach;
+
+		return $index;
+	}
+
+	/**
+	 * Acceptable Search Terms
+	 * 
+	 * @return array
+	 */
+	public function acceptablePostSearchTerms()
+	{
+		return apply_filters('wp-rest-api-search-whitelist', array(
+			'author',
+			'title',
+			'date',
+			'date_gmt',
+			'content',
+			'title',
+			'status',
+			'type',
+			'name',
+			'guid',
+			'comment_count',
+			'parent',
+			'modified',
+			'modified_gmt',
+			'ping_status',
+			'comment_status',
+			'excerpt',
+			'id'
+		));
+	}
 }

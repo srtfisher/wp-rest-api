@@ -66,7 +66,7 @@ class Application {
 		$this->introspector = new Introspector();
 		$this->admin = new Admin();
 
-		add_action('template_redirect', array(&$this, 'template_redirect'));
+		add_action('template_redirect', array(&$this, 'template_redirect'), 1);
 	}
 
 	/**
@@ -110,7 +110,7 @@ class Application {
 
 		$arguments = $this->router->getArguments();
 		$method = $this->router->getMethod();
-		
+
 		$object = $controllers[$controller]['object'];
 
 		if (! method_exists($object, $method)) :
