@@ -26,6 +26,13 @@ class Authentication {
 	const READ = 'read';
 
 	/**
+	 * No permissions to do anything
+	 *
+	 * @var string
+	 */
+	const NONE = 'none';
+
+	/**
 	 * Static Instance Store
 	 * 
 	 * @var object
@@ -97,20 +104,6 @@ class Authentication {
 	}
 
 	/**
-	 * Valid Access Types
-	 *
-	 * @uses do_action() Calls `wp-rest-api-auth-types`
-	 * @return array
-	 */
-	public function accessTypes()
-	{
-		return (array) apply_filters('wp-rest-api-auth-types', array(
-			self::READ,
-			self::READ_WRITE
-		));
-	}
-
-	/**
 	 * Determine the Current Access from the Application Request
 	 *
 	 * @return  void
@@ -145,17 +138,14 @@ class Authentication {
 	{
 		$httpMethod = Application::Instance()->request->server->get('REQUEST_METHOD');
 		$access = $this->determineAccess();
-		
-		if (! $access) :
-			// Un-authed request
-			$level = self::READ;
-		else :
-			$level = $access['access'];
-		endif;
 
+		$level = (! $access) ? $this->defaultLevel() : $access['access'];
+		
 		if (has_action('wp-rest-api-auth-check-'.$httpMethod))
 			return do_action('wp-rest-api-auth-check-'.$httpMethod, $access);
 
+		if ($level == self::NONE) return false;
+		
 		switch (strtolower($httpMethod))
 		{
 			case 'get' :
@@ -169,5 +159,31 @@ class Authentication {
 				return ($level == self::READ_WRITE);
 				break;
 		}
+	}
+
+	/**
+	 * Default Access Level
+	 *
+	 * @uses  apply_filters() Calls on the `wp-rest-api-default-access` filter
+	 * @return string
+	 */
+	public function defaultLevel()
+	{
+		return apply_filters('wp-rest-api-default-access', self::READ);
+	}
+
+	/**
+	 * Valid Access Types
+	 *
+	 * @uses do_action() Calls `wp-rest-api-auth-types`
+	 * @return array
+	 */
+	public function accessTypes()
+	{
+		return (array) apply_filters('wp-rest-api-auth-types', array(
+			self::READ,
+			self::READ_WRITE,
+			self::NONE
+		));
 	}
 }
