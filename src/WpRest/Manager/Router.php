@@ -22,6 +22,12 @@ class Router {
 
 		$count = count($explode);
 
+		// Resource Controller Setup
+		if ($count == 2 AND is_numeric( $explode[1] )) :
+			$explode[2] = $explode[1];
+			$explode[1] = 'single';
+		endif;
+
 		// Some hard logic.
 		if ($count == 0 OR ($count == 1 AND $explode[0] == '')) :
 			$controller = $this->defaultController();

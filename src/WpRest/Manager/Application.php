@@ -101,7 +101,7 @@ class Application {
 
 		$arguments = $this->router->getArguments();
 		$method = $this->router->getMethod();
-
+		
 		$object = $controllers[$controller]['object'];
 
 		if (! method_exists($object, $method)) :

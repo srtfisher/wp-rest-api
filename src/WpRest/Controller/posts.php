@@ -1,5 +1,7 @@
 <?php namespace WpRest\Controller;
 
+use WpRest\Response;
+
 class Posts extends BaseController implements ControllerInterface {
 	public $base = 'posts';
 	
@@ -21,6 +23,11 @@ class Posts extends BaseController implements ControllerInterface {
 		global $json_api;
 		$posts = $json_api->introspector->get_posts();
 		return $this->posts_result($posts);
+	}
+
+	public function getSingle($id = 0)
+	{
+		return Response::json(['id' => $id]);
 	}
 
 	/**
