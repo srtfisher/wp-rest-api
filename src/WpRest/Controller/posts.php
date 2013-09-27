@@ -1,6 +1,7 @@
 <?php namespace WpRest\Controller;
 
-use WpRest\Response;
+use WpRest\Response,
+	WpRest\Manager\Application;
 
 class Posts extends BaseController implements ControllerInterface {
 	public $base = 'posts';
@@ -27,7 +28,7 @@ class Posts extends BaseController implements ControllerInterface {
 
 	public function getSingle($id = 0)
 	{
-		return Response::json(['id' => $id]);
+		return Response::json(['id' => (int) $id]);
 	}
 
 	/**

@@ -3,6 +3,15 @@
 use Symfony\Component\HttpFoundation\BinaryFileResponse,
 	Symfony\Component\HttpFoundation\Response as ResponseBase;
 
+/**
+ * Response Interface
+ *
+ * Used in the Application to manage the various response
+ * that it needs.
+ *
+ * @package  wprest
+ * @package  response
+ */
 class Response extends ResponseBase
 {
 	/**
@@ -38,9 +47,7 @@ class Response extends ResponseBase
 		$response = new BinaryFileResponse($file, 200, $headers, true, 'attachment');
 
 		if ( ! is_null($name))
-		{
 			return $response->setContentDisposition('attachment', $name);
-		}
 
 		return $response;
 	}

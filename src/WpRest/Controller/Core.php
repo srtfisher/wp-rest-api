@@ -1,6 +1,7 @@
 <?php namespace WpRest\Controller;
 
-use WpRest\Response;
+use WpRest\Response,
+	WpRest\Manager\Application;
 
 class Core extends BaseController implements ControllerInterface {
 	public $base = 'core';
@@ -25,7 +26,7 @@ class Core extends BaseController implements ControllerInterface {
 	 */
 	public function getIndex()
 	{
-		return Response::json(['status' => 'ok']);
+		return $this->response->json(['status' => 'ok']);
 
 		global $json_api;
 		$php = '';

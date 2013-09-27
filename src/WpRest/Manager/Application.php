@@ -114,6 +114,10 @@ class Application {
 
 		do_action('wp-rest-api-before-method-call', array($controller, $method, $arguments));
 
+		// Hook onto this request
+		do_action('wp-rest-api-controller-'.$controller, compact('method', 'arguments'));
+		do_action('wp-rest-api-controller-'.$controller.'-method-'.$method, $arguments);
+		
 		// Do the response here
 		$response = call_user_func_array(array($object, $method), $arguments);
 

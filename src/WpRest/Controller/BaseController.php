@@ -1,48 +1,38 @@
 <?php namespace WpRest\Controller;
 
+use WpRest\Manager\ResponseObject;
+
 abstract class BaseController {
-	/**
-	 * Manipulate the response
-	 *
-	 * Override this for each custom use case
-	 * 
-	 * @param mixed
-	 * @param integer
-	 * @return string
-	 */
-	public function response($data = array(), $http_code = 200)
+	protected $response;
+
+	public function __construct()
 	{
-		return json_encode($data);
+		$this->response = new ResponseObject;
 	}
 
 	/**
-	 * Human Readable method names
-	 *
-	 * @param  string name
+	 * Make a simple response
+	 * 
+	 * @param string
+	 * @param  integer
+	 * @param  array
+	 * @return object
 	 */
-	public function humanMethodName($name)
+	protected function response($data, $statusCode = 200, array $headers = array())
 	{
-		switch ($name)
-		{
-			case 'index' :
-				$r = 'GET %s/%s/';
-				break;
+		return Response::make($data, $statusCode, $headers);
+	}
 
-			case 'store' :
-				$r = 'POST %s/%s/';
-				break;
-
-			default :
-				$methods = array(
-					'put',
-					'post',
-					'delete',
-					'get',
-				);
-				break;
-				$r = $name;
-		}
-
-		return $r;
+	/**
+	 * Make a JSON response
+	 * 
+	 * @param mixed
+	 * @param  integer
+	 * @param  array
+	 * @return object
+	 */
+	protected function json($data, $statusCode = 200, array $headers = array())
+	{
+		return Response::json($data, $statusCode, $headers);
 	}
 }

@@ -1,22 +1,22 @@
-JSON API
-======
+WP REST API
+===========
 A RESTful API for WordPress
 
 
 ## Description
-JSON API allows you to retrieve and manipulate WordPress content using HTTP requests. There are three main goals:
+WP REST API allows you to add API interfaces on top of WordPress. Many applications are now built onto of WordPress. It has happened that another third party application had to communicate with WordPress data in an easy to use manner. I made this as a result.
+
+This originally was the [JSON API](http://wordpress.org/plugins/json-api/) plugin but now it has been completely rebuilt to allow for a true REST-ful system to build an API on top of WordPress. We still share the same goals as the original JSON API project:
 
 1. Provide a simple, consistent external interface
 2. Create a stable, understandable internal implementation
 3. Enable new types of extensions for WordPress
 
-This plugin was created at [The Museum of Modern Art](http://moma.org/) for the weblog [Inside/Out](http://moma.org/explore/inside_out), which is served from Ruby on Rails. Instead of reimplementing the site templates as a WordPress theme, we opted for a Rails front-end that displays content served from a WordPress back-end. JSON API provides the necessary interface for retrieving content and accepting comment submissions.
-
 See the [Other Notes](http://wordpress.org/extend/plugins/json-api/other_notes/) section for the complete documentation.
 
 ## Installation
 
-1. Upload the `json-api` folder to the `/wp-content/plugins/` directory or install directly through the plugin installer.
+1. Upload the `wp-rest-api` folder to the `/wp-content/plugins/` directory or install directly through the plugin installer.
 2. Activate the plugin through the 'Plugins' menu in WordPress or by using the link provided by the plugin installer.
 
 ## Screenshots
