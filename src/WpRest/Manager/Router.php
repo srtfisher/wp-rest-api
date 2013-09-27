@@ -22,7 +22,7 @@ class Router {
 			$request_url = $explodeRequest[0];
 		endif;
 
-		preg_match('~/api/?(.*?)$~', $_SERVER['REQUEST_URI'], $this->rawRequest);
+		preg_match('~/api/?(.*?)$~', $request_url, $this->rawRequest);
 
 		$this->requestStructured = array();
 		$explode = explode('/', $this->rawRequest[1], 3);

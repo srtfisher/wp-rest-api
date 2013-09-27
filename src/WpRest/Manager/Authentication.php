@@ -111,9 +111,8 @@ class Authentication {
 	public function determineAccess()
 	{
 		if ($this->access) return $this->access;
-
-		$a = Application::Instance();
-		$key = $a->request->get('apiKey');
+		
+		$key = $this->requestApiKey();
 
 		if (! $key) return false;
 		$keys = $this->keys();
@@ -124,6 +123,16 @@ class Authentication {
 
 		$this->access = $keys[$key];
 		return $this->access;
+	}
+
+	/**
+	 * Retrieve the API key from the request
+	 *
+	 * @return  string
+	 */
+	public function requestApiKey()
+	{
+		return Application::Instance()->request->get('apiKey');
 	}
 
 	/**

@@ -12,6 +12,13 @@ use Symfony\Component\HttpFoundation\Request,
  */
 class Application {
 	/**
+	 * Version information about the Application
+	 *
+	 * @var string
+	 */
+	const VERSION = '0.1';
+	
+	/**
 	 * Static Instance Store
 	 * 
 	 * @var object
@@ -116,7 +123,7 @@ class Application {
 
 		// Determine Authentication
 		$Authentication = Authentication::Instance();
-		
+
 		if (! $Authentication->determineRequestAccess())
 			return $this->applicationError(403);
 

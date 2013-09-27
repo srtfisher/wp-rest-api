@@ -24,7 +24,7 @@ class Core extends BaseController implements ControllerInterface {
 			'description' => 'Basic introspection methods',
 		);
 	}
-	
+
 	/**
 	 * Core API Information
 	 *
@@ -32,7 +32,21 @@ class Core extends BaseController implements ControllerInterface {
 	 */
 	public function getIndex()
 	{
-		return $this->response->json(['status' => 'ok']);
+		$response = array();
+		$response['status'] = 'ok';
+		$response['version'] = Application::VERSION;
+		$response['controllers'] = array_values(Application::Instance()->activeControllers());
+
+		// If they are authenticated
+		$authentication = \WpRest\Manager\Authentication::Instance();
+		$auth = $authentication->determineAccess();
+		
+		if ($auth) :
+			$response['authentication'] = array();
+			$response['authentication']['key'] = $authentication->requestApiKey();
+			$response['authentication']['access'] = $auth['access'];
+		endif;
+		return $this->response->json($response);
 
 		global $json_api;
 		$php = '';
