@@ -2,7 +2,8 @@
 
 use Symfony\Component\HttpFoundation\Request,
 	Symfony\Component\HttpFoundation\Response,
-	JsonApi\Manager\Collection;
+	JsonApi\Manager\Collection,
+	JsonApi\Manager\Router;
 
 /**
  * JSON API Manager
@@ -48,15 +49,22 @@ class Application {
 			$_SERVER
 		);
 
+		$this->router = new Router;
 		$this->introspector = new Introspector();
 		$this->response = new Response();
-
+		
+		add_filter('query_vars', array(&$this, 'query_vars'));
 		add_action('template_redirect', array(&$this, 'template_redirect'));
 		add_action('admin_menu', array(&$this, 'admin_menu'));
-		add_action('update_option_json_api_base', array(&$this, 'flush_rewrite_rules'));
-		add_action('pre_update_option_json_api_controllers', array(&$this, 'update_controllers'));
+		//add_action('update_option_json_api_base', array(&$this, 'flush_rewrite_rules'));
+		//add_action('pre_update_option_json_api_controllers', array(&$this, 'update_controllers'));
 	}
-	
+
+	public function query_vars($wp_vars) {
+		$wp_vars[] = 'json';
+		return $wp_vars;
+	}
+
 	/**
 	 * Return an Instance of the JSON API
 	 * 
@@ -78,8 +86,9 @@ class Application {
 	public function template_redirect()
 	{
 		// Not in the area, ignore.
-		if (! $this->isApiRequest()) return;
+		if (! $this->router->isApiRequest()) return;
 
+		exit;
 		// Check to see if there's an appropriate API controller + method    
 		$controller = strtolower($this->query->get_controller());
 		$available_controllers = $this->get_controllers();
@@ -183,7 +192,7 @@ class Application {
 			$settings->base = sanitize_title_with_dashes($_POST['wp-rest-api-base']);
 			$settings->save();
 			$this->flush_rewrite_rules();
-			
+
 			?><div class="updated"><p><?php _e('API Base Updated.'); ?></p></div><?php
 		endif;
 

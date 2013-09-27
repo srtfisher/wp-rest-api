@@ -1,5 +1,4 @@
 <?php namespace JsonApi\Controller;
-//use JsonApi\Controller\ControllerInterface;
 
 class Core implements ControllerInterface {
 	public $base = 'core';

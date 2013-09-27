@@ -11,11 +11,11 @@ Author URI: http://phiffer.org/
 use JsonApi\Manager\Application,
 	JsonApi\Manager\Settings;
 
-if (! file_exists($dir.'/vendor/autoload.php')) :
+if (! file_exists(__DIR__.'/vendor/autoload.php')) :
 	echo "Composer not setup for REST API";
 	return;
 else :
-	require_once $dir.'/vendor/autoload.php';
+	require_once __DIR__.'/vendor/autoload.php';
 endif;
 
 /**
@@ -27,9 +27,7 @@ endif;
 function json_api_init() {
 	if (phpversion() < 5.3)
 		return add_action('admin_notices', 'json_api_php_version_warning');
-
-	add_filter('rewrite_rules_array', 'json_api_rewrites');
-
+	
 	Application::Instance();
 }
 
@@ -41,56 +39,6 @@ function json_api_init() {
 function json_api_php_version_warning() {
 	echo "<div id=\"json-api-warning\" class=\"updated fade\"><p>Sorry, JSON API requires PHP version 5.0 or greater.</p></div>";
 }
-
-/**
- * Activation Hook
- *
- * @access private
- * @return void
- */
-function json_api_activation() {
-	// Add the rewrite rule on activation
-	global $wp_rewrite;
-	add_filter('rewrite_rules_array', 'json_api_rewrites');
-	$wp_rewrite->flush_rules();
-}
-
-/**
- * Deactivation Hook
- *
- * @access private
- * @return void
- */
-function json_api_deactivation() {
-	// Remove the rewrite rule on deactivation
-	global $wp_rewrite;
-	$wp_rewrite->flush_rules();
-}
-
-/**
- * Filter Applied for Rewrite Actions
- *
- * @access private
- */
-function json_api_rewrites($wp_rules) {
-	$settings = Settings::Instance();
-
-	if (! $settings->base)
-		$base = 'api';
-	else
-		$base = $settings->base;
-
-	if (empty($base)) {
-		return $wp_rules;
-	}
-	$json_api_rules = array(
-		"$base\$" => 'index.php?apiRequest=Coreinfo',
-		"$base/(.+)\$" => 'index.php?apiRequest=$matches[1]'
-	);
-
-	return array_merge($json_api_rules, $wp_rules);
-}
-
 
 /**
  * Setup the Default Controllers
