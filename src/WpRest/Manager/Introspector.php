@@ -13,6 +13,7 @@ class Introspector {
 	 */
 	public function get_posts($query = false, $wp_posts = false) {
 		global $post;
+		
 		$this->set_posts_query($query);
 		//query_posts($query);
 

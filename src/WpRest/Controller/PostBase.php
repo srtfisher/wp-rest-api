@@ -24,15 +24,15 @@ abstract class PostBase extends BaseController {
 
 		// Check by ID
 		if ($query->has('id') OR $query->has('post_id')) :
-			$wpQuery['p'] = ($query->has('id')) ? $query->get('id') : $query->get('post_id');
+			$wpQuery['p'] = ($query->has('id')) ? (int) $query->get('id') : (int) $query->get('post_id');
 
 		// Check for post slug
 		elseif ( $query->has('slug') OR $query->has('post_slug') ) :
 			$wpQuery['name'] = ($query->has('slug')) ? $query->get('slug') : $query->get('post_slug');
 		endif;
-
-		$posts = $introspector->get_posts($introspector->queryTranslate($wpQuery));
-
+		$wpQuery['post_type'] = $this->type;
+		$posts = $introspector->get_posts($wpQuery);
+		
 		return $this->response($posts);
 	}
 
