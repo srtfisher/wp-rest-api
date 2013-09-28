@@ -9,7 +9,7 @@ abstract class PostBase extends BaseController {
 	/**
 	 * List all posts
 	 * 
-	 * GET /posts
+	 * GET /{type}
 	 */
 	public function getIndex()
 	{
@@ -40,7 +40,7 @@ abstract class PostBase extends BaseController {
 	}
 
 	/**
-	 * GET /posts/{id}
+	 * GET /{type}/{id}
 	 */
 	public function getSingle($id = 0)
 	{
@@ -61,9 +61,25 @@ abstract class PostBase extends BaseController {
 	}
 
 	/**
+	 * Delete a Post
+	 *
+	 * DELETE /{type}/{id}
+	 */
+	public function deleteSingle($id = 0)
+	{
+		$id = (int) $id;
+		if ($id < 1) return $this->error(404);
+
+		wp_delete_post($id);
+		return $this->response->json(array(
+			'status' => 'deleted',
+		));
+	}
+
+	/**
 	 * Create a new post
 	 *
-	 * POST /posts
+	 * POST /{type}
 	 */
 	public function postIndex()
 	{
