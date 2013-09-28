@@ -180,7 +180,7 @@ class Admin {
 			<?php endforeach; ?>
 		</h2>
 
-		<p><?php _e('Authentication with the WP REST API is done via API Keys. To perform a logged in request, append a API key to the request.'); ?></p></div>
+		<p><?php _e('Authentication with the WP REST API is done via API Keys. To perform a logged in request, append a API key to the request.'); ?></p>
 		<table class="widefat">
 			<?php foreach (array('thead', 'tfoot') as $t) : ?>
 			<<?php echo $t; ?>>
