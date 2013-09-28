@@ -18,22 +18,19 @@ abstract class PostBase extends BaseController {
 		$introspector = Application::Instance()->introspector;
 
 		$authed = $a->requestApiKey();
-		$query = $this->request->query->all();
-		$acceptableTerms = $introspector->acceptablePostSearchTerms();
+		
+		$query = $this->request->query;
 		$wpQuery = array();
 
-		if (count($query) > 0) : foreach ($query as $key => $value) :
-			if (! in_array($key, $acceptableTerms))
-				continue;
+		// Check by ID
+		if ($query->has('id') OR $query->has('post_id')) :
+			$wpQuery['p'] = ($query->has('id')) ? $query->get('id') : $query->get('post_id');
 
-			if (($key == 'type' OR $key == 'status') AND ! $authed)
-				continue;
+		// Check for post slug
+		elseif ( $query->has('slug') OR $query->has('post_slug') ) :
+			$wpQuery['name'] = ($query->has('slug')) ? $query->get('slug') : $query->get('post_slug');
+		endif;
 
-			$wpQuery[$key] = $value;
-		endforeach; endif;
-
-		$wpQuery['type'] = $this->type;
-		
 		$posts = $introspector->get_posts($introspector->queryTranslate($wpQuery));
 
 		return $this->response($posts);
