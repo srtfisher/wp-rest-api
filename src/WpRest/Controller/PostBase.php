@@ -18,7 +18,7 @@ abstract class PostBase extends BaseController {
 		$introspector = Application::Instance()->introspector;
 
 		$authed = $a->requestApiKey();
-		
+
 		$query = $this->request->query;
 		$wpQuery = array();
 
@@ -112,25 +112,54 @@ abstract class PostBase extends BaseController {
 				'post' => $post
 			));
 	}
+
+	/**
+	 * GET /{type}/search
+	 */
+	public function getSearch()
+	{
+		global $json_api;
+		$url = parse_url($this->request->server->get('REQUEST_URI'));
+
+		$query = $this->request->query->all();
+		array_shift($query);
+
+		$query['post_type'] = $this->type;
+		$defaults = array(
+			'ignore_sticky_posts' => true
+		);
+		unset($query['json']);
+		unset($query['post_status']);
+		unset($query['post_type']);
+		
+		$query = array_merge($defaults, $query);
+		$posts = $this->introspector->get_posts($query);
+		$result = $this->response($posts, 200, array(), array('query' => $query));
+
+		return $result;
+	}
 	
 	/**
 	 * Manage the results of this controller
 	 * 
 	 * @param mixed
 	 * @param integer
+	 * @param  array Additional entries to include in the response
 	 * @return string
 	 */
-	public function response($data = array(), $http_code = 200, array $headers = array())
+	public function response($data = array(), $http_code = 200, array $headers = array(), array $addon = array())
 	{
 		global $wp_query;
-
-		return $this->response->json(array(
+		$response = array(
 			'count' => count($data),
 			'count_total' => (int) $wp_query->found_posts,
 			'pages' => $wp_query->max_num_pages,
 			'current_page' => (($this->request->query->has('page')) ? (int) $this->request->query->get('page') : 1),
 			
 			$this->type.'s' => $data,
-		), $http_code, $headers);
+		);
+		$response = array_merge($response, $addon);
+
+		return $this->response->json($response, $http_code, $headers);
 	}
 }
