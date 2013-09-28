@@ -50,5 +50,7 @@ function wp_rest_api_default_controllers($collection)
 {
 	$collection->register(new WpRest\Controller\Core);
 	$collection->register(new WpRest\Controller\Posts);
+	$collection->register(new WpRest\Controller\Categories);
+	$collection->register(new WpRest\Controller\Tags);
 }
 add_action('wp-rest-api-controllers', 'wp_rest_api_default_controllers');

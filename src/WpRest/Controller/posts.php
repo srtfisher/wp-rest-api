@@ -5,7 +5,8 @@ use WpRest\Response,
 
 class Posts extends BaseController implements ControllerInterface {
 	public $base = 'posts';
-	
+	protected $type = 'post';
+
 	public function controllerInfo()
 	{
 		return array(
@@ -39,6 +40,8 @@ class Posts extends BaseController implements ControllerInterface {
 
 			$wpQuery[$key] = $value;
 		endforeach; endif;
+
+		$wpQuery['type'] = $this->type;
 		
 		$posts = $introspector->get_posts($introspector->queryTranslate($wpQuery));
 
@@ -58,31 +61,12 @@ class Posts extends BaseController implements ControllerInterface {
 		endif;
 
 		$post = get_post($id);
-		if (! $post)
+		if (! $post OR $post->post_type !== $this->type)
 			return $this->error(404);
 
 		return $this->response->json(array(
 			'post' => new \WpRest\Model\Post($post)
 		));
-	}
-
-	/**
-	 * Search Posts
-	 *
-	 * GET /posts/search
-	 */
-	public function getSearch()
-	{
-		if (! $this->request->get('s'))
-			return $this->error(400, 'No search variable passed.');
-
-		$introspector = Application::Instance()->introspector;
-
-		$posts = $introspector->get_posts(array(
-			's' => $this->request->get('s')
-		));
-		
-		return $this->response($posts);
 	}
 
 	/**
@@ -93,6 +77,7 @@ class Posts extends BaseController implements ControllerInterface {
 	public function postIndex()
 	{
 		$post = new \WpRest\Model\Post();
+		$_REQUEST['type'] = $this->type;
 		$id = $post->create($_REQUEST);
 
 		if (empty($id))
@@ -101,53 +86,6 @@ class Posts extends BaseController implements ControllerInterface {
 			return $this->response->json(array(
 				'post' => $post
 			));
-	}
-
-	/**
-	 * Category listing
-	 * 
-	 * GET /posts/categories
-	 */
-	public function getCategories()
-	{
-		$introspector = Application::Instance()->introspector;
-		$categories = $introspector->get_categories();
-
-		return $this->response->json(array(
-			'count' => count($categories),
-			'categories' => $categories
-		));
-	}
-
-	/**
-	 * Create category
-	 *
-	 * POST /post/tags
-	 */
-	public function postCategories()
-	{
-
-	}
-
-	/**
-	 * GET /posts/tags
-	 */
-	public function getTags() {
-		$tags = $this->introspector->get_tags();
-		return $this->response->json(array(
-			'count' => count($tags),
-			'tags' => $tags
-		));
-	}
-
-	/**
-	 * Create new tag
-	 * 
-	 * POST /posts/tags
-	 */
-	public function postTags()
-	{
-
 	}
 	
 	/**

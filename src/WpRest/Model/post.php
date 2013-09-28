@@ -58,27 +58,27 @@ class Post
 		
 		$wp_values = array();
 		
-		if (!empty($values['id'])) {
+		if (! empty($values['id'])) 
 			$wp_values['ID'] = $values['id'];
-		}
 		
-		if (!empty($values['type'])) {
+		
+		if (! empty($values['type'])) 
 			$wp_values['post_type'] = $values['type'];
-		}
 		
-		if (!empty($values['status'])) {
+		
+		if (! empty($values['status'])) 
 			$wp_values['post_status'] = $values['status'];
-		}
 		
-		if (!empty($values['title'])) {
+		
+		if (! empty($values['title'])) 
 			$wp_values['post_title'] = $values['title'];
-		}
 		
-		if (!empty($values['content'])) {
+		
+		if (! empty($values['content'])) 
 			$wp_values['post_content'] = $values['content'];
-		}
 		
-		if (!empty($values['author'])) {
+		
+		if (! empty($values['author'])) {
 			$author = $introspector->get_author_by_login($values['author']);
 			$wp_values['post_author'] = $author->id;
 		}
@@ -108,13 +108,12 @@ class Post
 			}
 		}
 		
-		if (isset($wp_values['ID'])) {
+		if (isset($wp_values['ID']))
 			$this->id = wp_update_post($wp_values);
-		} else {
+		else
 			$this->id = wp_insert_post($wp_values);
-		}
 		
-		if (!empty($_FILES['attachment'])) {
+		if (! empty($_FILES['attachment'])) {
 			include_once ABSPATH . '/wp-admin/includes/file.php';
 			include_once ABSPATH . '/wp-admin/includes/media.php';
 			include_once ABSPATH . '/wp-admin/includes/image.php';
