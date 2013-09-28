@@ -77,6 +77,27 @@ abstract class PostBase extends BaseController {
 	}
 
 	/**
+	 * Update a Post
+	 *
+	 * POST /{type}/{id}
+	 */
+	public function postSingle($id = 0)
+	{
+		$id = (int) $id;
+		if ($id < 1) return $this->error(404);
+
+		$post = get_post($id);
+		if (! $post) return $this->error(404);
+
+		$object = new \WpRest\Model\Post($post);
+		$object->update($_REQUEST);
+
+		return $this->response->json(array(
+			'post' => $object
+		));
+	}
+
+	/**
 	 * Create a new post
 	 *
 	 * POST /{type}
