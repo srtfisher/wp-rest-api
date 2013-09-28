@@ -94,7 +94,9 @@ abstract class PostBase extends BaseController {
 			'count' => count($data),
 			'count_total' => (int) $wp_query->found_posts,
 			'pages' => $wp_query->max_num_pages,
-			'posts' => $data
+			'current_page' => (($this->request->query->has('page')) ? (int) $this->request->query->get('page') : 1),
+			
+			$this->type.'s' => $data,
 		), $http_code, $headers);
 	}
 }

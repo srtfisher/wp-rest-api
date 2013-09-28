@@ -13,7 +13,8 @@ class Introspector {
 	 */
 	public function get_posts($query = false, $wp_posts = false) {
 		global $post;
-		query_posts($query);
+		$this->set_posts_query($query);
+		//query_posts($query);
 
 		$output = array();
 		while (have_posts()) {
@@ -280,29 +281,36 @@ class Introspector {
 		return in_array($author->name, $this->active_authors);
 	}
 	
-	protected function set_posts_query($query = false) {
+	/**
+	 * Setup the query for the current page
+	 * 
+	 * @param array Query Arguments
+	 * @param boolean Should we merge query with current wp_query? (Default is no)
+	 */
+	protected function set_posts_query($query = false, $merge = false) {
 		global $wp_query;
 		
 		if (! $query)
 			$query = array();
 		
-		$query = array_merge($query, $wp_query->query);
+		if ($merge)
+			$query = array_merge($query, $wp_query->query);
+
+		$application = \WpRest\Manager\Application::Instance();
+
+		if ($application->request->query->get('page'))
+			$query['paged'] = $application->request->query->get('page');
 		
-		if ($json_api->query->page) {
-			$query['paged'] = $json_api->query->page;
-		}
 		
-		if ($json_api->query->count) {
-			$query['posts_per_page'] = $json_api->query->count;
-		}
+		if ($application->request->query->get('count')) 
+			$query['posts_per_page'] = $application->request->query->get('count');
 		
-		if ($json_api->query->post_type) {
-			$query['post_type'] = $json_api->query->post_type;
-		}
 		
-		if (!empty($query)) {
+		//if ($application->query->get('page')) 
+		//	$query['post_type'] = $application->query->get('page');
+		
+		if (! empty($query)) 
 			query_posts($query);
-		}
 	}
 		
 	/**
