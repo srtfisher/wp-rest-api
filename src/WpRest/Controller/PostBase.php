@@ -97,9 +97,9 @@ abstract class PostBase extends BaseController {
 	/**
 	 * Create a new post
 	 *
-	 * POST /{type}
+	 * PUT /{type}
 	 */
-	public function postIndex()
+	public function putIndex()
 	{
 		$post = new \WpRest\Model\Post();
 		$_REQUEST['type'] = $this->type;
@@ -137,6 +137,84 @@ abstract class PostBase extends BaseController {
 		$result = $this->response($posts, 200, array(), array('query' => $query));
 
 		return $result;
+	}
+
+	/**
+	 * Delete a Meta Record
+	 *
+	 * Required Arguments:
+	 * - key
+	 * - value (optional)
+	 * 
+	 * Access via DELETE /{type}/meta/{id}
+	 */
+	public function deleteMeta($id = 0)
+	{
+		$id = (int) $id;
+		if ($id < 1) return $this->error(404);
+
+		$post = get_post($id);
+		if (! $post) return $this->error(404);
+
+		$key = $this->request->get('key');
+		$value = $this->request->get('value', '');
+		
+		return $this->response->json(array(
+			'status' => delete_post_meta($id, $key, $value)
+		));
+	}
+
+	/**
+	 * Save a Meta Record for a Post
+	 *
+	 * Required Arguments:
+	 * - key
+	 * - value (serialized already)
+	 * - previous_value (mixed)
+	 * 
+	 * Access via PUT /{type}/meta/{id}
+	 */
+	public function putMeta($id = 0)
+	{
+		$id = (int) $id;
+		if ($id < 1) return $this->error(404);
+
+		$post = get_post($id);
+		if (! $post) return $this->error(404);
+
+		$key = $this->request->get('key');
+		$value = $this->request->get('value', '');
+		$previous = $this->request->get('previous_value', '');
+
+		return $this->response->json(array(
+			'status' => update_post_meta($id, $key, $value, $previous)
+		));
+	}
+
+	/**
+	 * Access a List of Meta Fields for a Post
+	 */
+	public function getMeta($id = 0, $key = '')
+	{
+		$id = (int) $id;
+		$key = trim($key);
+		if ($id < 1) return $this->error(404);
+
+		$post = get_post($id);
+		if (! $post OR $post->post_type !== $this->type) return $this->error(404);
+
+		$single = $this->request->get('single', true);
+		$single = (strtolower($single) == 'true' OR $single == true);
+
+		if (empty($key))
+			return $this->response->json(array(
+				'response' => get_metadata('post', $id)
+			));
+		else
+			return $this->response->json(array(
+				'key' => $key,
+				'response' => get_post_meta($id, $key, $single)
+			));
 	}
 	
 	/**

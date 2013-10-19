@@ -54,14 +54,7 @@ class Application {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->request = new Request(
-			$_GET,
-			$_POST,
-			array(),
-			$_COOKIE,
-			$_FILES,
-			$_SERVER
-		);
+		$this->request = Request::createFromGlobals();
 
 		$this->introspector = new Introspector();
 		$this->admin = new Admin();
