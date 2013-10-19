@@ -1,7 +1,8 @@
 <?php namespace WpRest\Controller;
 
 use WpRest\Response,
-	WpRest\Manager\Application;
+	WpRest\Manager\Application,
+	WpRest\Common\Helper;
 
 abstract class PostBase extends BaseController {
 	protected $type = 'post';
@@ -102,11 +103,16 @@ abstract class PostBase extends BaseController {
 	public function putIndex()
 	{
 		$post = new \WpRest\Model\Post();
-		$_REQUEST['type'] = $this->type;
-		$id = $post->create($_REQUEST);
+
+		$parameters = $this->request->request;
+		
+		// We override the request here to manually specify the post_type
+		// specific to this controller
+		$parameters->set('type', $this->type);
+		$id = $post->create($parameters->all());
 
 		if (empty($id))
-			return $this->error("Could not create post.");
+			return $this->error('Could not create post.');
 		else
 			return $this->response->json(array(
 				'post' => $post
@@ -172,9 +178,9 @@ abstract class PostBase extends BaseController {
 	 * - value (serialized already)
 	 * - previous_value (mixed)
 	 * 
-	 * Access via PUT /{type}/meta/{id}
+	 * Access via PUT /{type}/meta/{post id}/{key?}
 	 */
-	public function putMeta($id = 0)
+	public function putMeta($id = 0, $key = '')
 	{
 		$id = (int) $id;
 		if ($id < 1) return $this->error(404);
@@ -182,7 +188,7 @@ abstract class PostBase extends BaseController {
 		$post = get_post($id);
 		if (! $post) return $this->error(404);
 
-		$key = $this->request->get('key');
+		$key = ($key == '') ? $this->request->get('key', '') : $key;
 		$value = $this->request->get('value', '');
 		$previous = $this->request->get('previous_value', '');
 
@@ -193,6 +199,8 @@ abstract class PostBase extends BaseController {
 
 	/**
 	 * Access a List of Meta Fields for a Post
+	 *
+	 * GET {type}/{meta}/{post id}/{key?}
 	 */
 	public function getMeta($id = 0, $key = '')
 	{
@@ -206,15 +214,31 @@ abstract class PostBase extends BaseController {
 		$single = $this->request->get('single', true);
 		$single = (strtolower($single) == 'true' OR $single == true);
 
-		if (empty($key))
+		if (empty($key)) :
+			// We're getting all of the meta values
+			$meta = get_metadata('post', $id);
+			$index = array();
+
+			if ($meta) :
+				foreach ($meta as $k => $metaIndex)
+				{
+					$index[$k] = array();
+
+					if ($metaIndex) : foreach ($metaIndex as $v)
+						$index[$k][] = Helper::jsonDecode($v);
+					endif;
+				}
+			endif;
+
 			return $this->response->json(array(
-				'response' => get_metadata('post', $id)
+				'response' => $index,
 			));
-		else
+		else :
 			return $this->response->json(array(
 				'key' => $key,
-				'response' => get_post_meta($id, $key, $single)
+				'response' => Helper::jsonDecode(get_post_meta($id, $key, $single))
 			));
+		endif;
 	}
 	
 	/**
