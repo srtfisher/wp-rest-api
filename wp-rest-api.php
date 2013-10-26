@@ -14,7 +14,8 @@ if (! file_exists(__DIR__.'/vendor/autoload.php')) :
 	echo "Composer not setup for REST API";
 	return;
 else :
-	require_once __DIR__.'/vendor/autoload.php';
+	$loader = require_once __DIR__.'/vendor/autoload.php';
+	$loader->add('WpRest', __DIR__.'/src');
 endif;
 
 /**
