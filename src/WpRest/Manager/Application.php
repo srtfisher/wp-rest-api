@@ -118,7 +118,7 @@ class Application {
 		$Authentication = Authentication::Instance();
 
 		if (! $Authentication->determineRequestAccess())
-			return $this->applicationError(403);
+			return $this->applicationError(403, 'Invalid credentials.');
 
 		do_action('wp-rest-api-before-method-call', array($controller, $method, $arguments));
 
