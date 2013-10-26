@@ -133,7 +133,7 @@ class Authentication {
 	 */
 	public function requestApiKey()
 	{
-		return Application::Instance()->request->get('apiKey');
+		return Application::Instance()->request->query->get('apiKey', null);
 	}
 
 	/**
