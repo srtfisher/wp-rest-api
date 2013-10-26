@@ -10,12 +10,10 @@ Author URI: http://seanfisher.co/
 
 use WpRest\Manager\Application;
 
-if (! file_exists(__DIR__.'/vendor/autoload.php')) :
-	echo "Composer not setup for REST API";
-	return;
-else :
+if (! file_exists(__DIR__.'/vendor/autoload.php'))
+	wp_die('Composer not setup for REST API');
+else
 	require_once __DIR__.'/vendor/autoload.php';
-endif;
 
 /**
  * Initialize the Plugin
@@ -48,10 +46,10 @@ function json_api_php_version_warning() {
  */
 function wp_rest_api_default_controllers($collection)
 {
-	$collection->register(new \WpRest\Controller\Core);
-	$collection->register(new \WpRest\Controller\Posts);
-	$collection->register(new \WpRest\Controller\Pages);
-	$collection->register(new \WpRest\Controller\Categories);
-	$collection->register(new \WpRest\Controller\Tags);
+	$collection->register(new WpRest\Controller\Core);
+	$collection->register(new WpRest\Controller\Posts);
+	$collection->register(new WpRest\Controller\Pages);
+	$collection->register(new WpRest\Controller\Categories);
+	$collection->register(new WpRest\Controller\Tags);
 }
 add_action('wp-rest-api-controllers', 'wp_rest_api_default_controllers');
