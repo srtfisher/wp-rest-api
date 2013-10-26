@@ -233,7 +233,7 @@ class Introspector {
 		$attachments = array();
 		if (!empty($wp_attachments)) {
 			foreach ($wp_attachments as $wp_attachment) {
-				$attachments[] = new JSON_API_Attachment($wp_attachment);
+				$attachments[] = new \WpRest\Model\Attachment($wp_attachment);
 			}
 		}
 		return $attachments;

@@ -200,7 +200,7 @@ abstract class PostBase extends BaseController {
 	/**
 	 * Access a List of Meta Fields for a Post
 	 *
-	 * GET {type}/{meta}/{post id}/{key?}
+	 * GET {type}/meta/{post id}/{key?}
 	 */
 	public function getMeta($id = 0, $key = '')
 	{
@@ -239,6 +239,44 @@ abstract class PostBase extends BaseController {
 				'response' => Helper::jsonDecode(get_post_meta($id, $key, $single))
 			));
 		endif;
+	}
+
+	/**
+	 * Retrieve a Featured Image
+	 *
+	 * GET {type}/image/{post id}
+	 */
+	public function getImage($id = 0, $key = '')
+	{
+		$id = (int) $id;
+		$key = trim($key);
+		if ($id < 1) return $this->error(404);
+
+		$post = get_post($id);
+		if (! $post OR $post->post_type !== $this->type) return $this->error(404);
+
+		$response = array();
+		$imageId = get_post_thumbnail_id($post->ID);
+		$icon = $this->request->get('icon', 'false');
+		$icon = (boolean) ($icon == 'true');
+		$size = $this->request->get('size', 'full');
+
+		if ($imageId) :
+			$image = wp_get_attachment_image_src($imageId, $size, $icon);
+
+			if ($image)
+				$response['image'] = [
+					'src' => $image[0],
+					'width' => $image[1],
+					'height' => $image[2]
+				];
+			else
+				$response['image'] = null;
+		else :
+			$response['image'] = null;
+		endif;
+
+		return $this->response->json($response);
 	}
 	
 	/**
