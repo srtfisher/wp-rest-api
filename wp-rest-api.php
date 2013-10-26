@@ -48,10 +48,10 @@ function json_api_php_version_warning() {
  */
 function wp_rest_api_default_controllers($collection)
 {
-	$collection->register(new WpRest\Controller\Core);
-	$collection->register(new WpRest\Controller\Posts);
-	$collection->register(new WpRest\Controller\Pages);
-	$collection->register(new WpRest\Controller\Categories);
-	$collection->register(new WpRest\Controller\Tags);
+	$collection->register(new \WpRest\Controller\Core);
+	$collection->register(new \WpRest\Controller\Posts);
+	$collection->register(new \WpRest\Controller\Pages);
+	$collection->register(new \WpRest\Controller\Categories);
+	$collection->register(new \WpRest\Controller\Tags);
 }
 add_action('wp-rest-api-controllers', 'wp_rest_api_default_controllers');
