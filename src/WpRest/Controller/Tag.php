@@ -3,7 +3,7 @@
 use WpRest\Response,
 	WpRest\Manager\Application;
 
-class Tags extends BaseController implements ControllerInterface {
+class Tag extends BaseController implements ControllerInterface {
 	public $base = 'tags';
 
 	public function controllerInfo()

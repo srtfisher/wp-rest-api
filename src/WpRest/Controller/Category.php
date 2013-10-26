@@ -3,7 +3,7 @@
 use WpRest\Response,
 	WpRest\Manager\Application;
 
-class Categories extends BaseController implements ControllerInterface {
+class Category extends BaseController implements ControllerInterface {
 	public $base = 'categories';
 
 	public function controllerInfo()

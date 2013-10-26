@@ -3,7 +3,7 @@
 use WpRest\Response,
 	WpRest\Manager\Application;
 
-class Pages extends PostBase implements ControllerInterface {
+class Page extends PostBase implements ControllerInterface {
 	protected $type = 'page';
 	public $base = 'pages';
 
