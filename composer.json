@@ -10,5 +10,9 @@
             "name": "Sean Fisher",
             "email": "srtfisher@gmail.com"
         }
-    ]
+    ],
+
+    "autoload": {
+        "psr-0": {"WpRest\\": "src/"}
+    }
 }
