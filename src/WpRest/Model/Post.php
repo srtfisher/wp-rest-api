@@ -145,7 +145,7 @@ class Post
 		$this->set_value('title', get_the_title($this->id));
 		$this->set_value('title_plain', strip_tags(@$this->title));
 		$this->set_content_value();
-		$this->set_value('excerpt', get_the_excerpt());
+		$this->set_value('excerpt', apply_filters( 'get_the_excerpt', $wp_post->post_excerpt ));
 		$this->set_value('date', get_the_time($date_format));
 		$this->set_value('modified', date($date_format, strtotime($wp_post->post_modified)));
 		$this->set_categories_value();
