@@ -118,7 +118,7 @@ class Post
 			include_once ABSPATH . '/wp-admin/includes/media.php';
 			include_once ABSPATH . '/wp-admin/includes/image.php';
 			$attachment_id = media_handle_upload('attachment', $this->id);
-			$this->attachments[] = new JSON_API_Attachment($attachment_id);
+			$this->attachments[] = new Attachment($attachment_id);
 			unset($_FILES['attachment']);
 		}
 		
@@ -205,7 +205,7 @@ class Post
 			$this->tags = array();
 			if ($wp_tags = get_the_tags($this->id)) {
 				foreach ($wp_tags as $wp_tag) {
-					$this->tags[] = new JSON_API_Tag($wp_tag);
+					$this->tags[] = new Tag($wp_tag);
 				}
 			}
 		} else {
