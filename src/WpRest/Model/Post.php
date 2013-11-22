@@ -33,6 +33,30 @@ class Post
 			$this->import_wp_object($wp_post);
 		}
 	}
+
+	/**
+	 * Create or update the post depending upon if the ID is passed
+	 *
+	 * @param  array Parameters
+	 * @throws  WpRest\Exception\DataException
+	 */
+	public static function createOrUpdate($values = array())
+	{
+		$values = (array) $values;
+		if (! $values)
+			throw new \WpRest\Exception\DataException('No parameters passed to create/update post.');
+
+		$object = new Post;
+
+		if (isset($values['id']) AND $values['id'] > 0) :
+			// Updating
+			$object->id = $values['id'];
+			return $object->update($values);
+		else :
+			// Creating
+			return $object->create($values);
+		endif;
+	}
 	
 	public function create($values = null)
 	{

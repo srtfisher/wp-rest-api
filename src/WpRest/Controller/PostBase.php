@@ -102,14 +102,12 @@ abstract class PostBase extends BaseController {
 	 */
 	public function putIndex()
 	{
-		$post = new \WpRest\Model\Post();
-
 		$parameters = $this->request->request;
 		
 		// We override the request here to manually specify the post_type
 		// specific to this controller
 		$parameters->set('type', $this->type);
-		$id = $post->create($parameters->all());
+		$id = \WpRest\Model\Post::createOrUpdate($parameters->all());
 
 		if (empty($id))
 			return $this->error('Could not create post.');
