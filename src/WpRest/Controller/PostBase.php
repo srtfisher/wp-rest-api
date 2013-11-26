@@ -112,9 +112,7 @@ abstract class PostBase extends BaseController {
 		if (empty($id))
 			return $this->error('Could not create post.');
 		else
-			return $this->response->json(array(
-				'post' => $post
-			));
+			return $this->getSingle($id);
 	}
 
 	/**
