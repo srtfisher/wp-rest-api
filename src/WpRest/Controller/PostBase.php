@@ -30,7 +30,10 @@ abstract class PostBase extends BaseController {
 		// Check for post slug
 		elseif ( $query->has('slug') OR $query->has('post_slug') ) :
 			$wpQuery['name'] = ($query->has('slug')) ? $query->get('slug') : $query->get('post_slug');
+		elseif ($query->has('category')) :
+			$wpQuery['category_name'] = $query->get('category');
 		endif;
+
 		$wpQuery['post_type'] = $this->type;
 		$posts = $introspector->get_posts($wpQuery);
 		
